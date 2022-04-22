@@ -1,3 +1,72 @@
+!classDefinition: #AvispaOriana category: 'AvispasYAbejasParte2'!
+DenotativeObject subclass: #AvispaOriana
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'AvispasYAbejasParte2'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'AvispaOriana class' category: 'AvispasYAbejasParte2'!
+AvispaOriana class
+	instanceVariableNames: 'huevos'!
+
+!AvispaOriana class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 18:10:40'!
+eliminarHuevos
+	huevos := 0.! !
+
+!AvispaOriana class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 17:49:00'!
+huevosPuestos
+	^huevos.! !
+
+!AvispaOriana class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 17:51:44'!
+intentarReproducirse
+	huevos := huevos + 1.! !
+
+
+!AvispaOriana class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 18:11:16'!
+initializeCollaboratorsFromFile
+	"Auto generated method for loading purposes - Do not modify it"
+
+	huevos := 2.! !
+
+
+!classDefinition: #Habitat category: 'AvispasYAbejasParte2'!
+DenotativeObject subclass: #Habitat
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'AvispasYAbejasParte2'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Habitat class' category: 'AvispasYAbejasParte2'!
+Habitat class
+	instanceVariableNames: 'avispas'!
+
+!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 17:25:33'!
+agregarAvispa: unaAvispa
+	avispas add: unaAvispa! !
+
+!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 18:06:27'!
+cantidadDeHuevosDeAvispas
+	|totalHuevos|
+	totalHuevos := 0.
+	avispas do: [:avispaActual | totalHuevos := (avispaActual huevosPuestos) + totalHuevos ].
+	^totalHuevos.! !
+
+!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 17:42:35'!
+retrocederAlInicioDeLosTiempos
+	avispas := OrderedCollection new.! !
+
+
+!Habitat class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 18:11:16'!
+initializeCollaboratorsFromFile
+	"Auto generated method for loading purposes - Do not modify it"
+
+	avispas := ((OrderedCollection new) add: AvispaOriana; yourself).! !
+
+
 !classDefinition: #PruebasReproduccionDeAvispas category: 'AvispasYAbejasParte2'!
 DenotativeObject subclass: #PruebasReproduccionDeAvispas
 	instanceVariableNames: ''
@@ -9,7 +78,7 @@ DenotativeObject subclass: #PruebasReproduccionDeAvispas
 
 !classDefinition: 'PruebasReproduccionDeAvispas class' category: 'AvispasYAbejasParte2'!
 PruebasReproduccionDeAvispas class
-	instanceVariableNames: ''!
+	instanceVariableNames: 'unHabitat avispaOriana'!
 
 !PruebasReproduccionDeAvispas class methodsFor: 'tests - Oriana' stamp: 'JMB 4/18/2022 18:38:11'!
 test01EnElInicioDeLosTiemposNoHayHuevos	
@@ -221,21 +290,20 @@ cantidadDeHuevosConLaFirmaGeneticaDeOrnella
 cantidadDeHuevosConLaFirmaGeneticaDePolly
 	Assert isTrue: false description: 'Reemplazar esto por la implementación correspondiente'.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'JMB 4/18/2022 18:43:42'!
+!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/22/2022 16:59:41'!
 habitat
-	Assert isTrue: false description: 'Reemplazar esto por la implementación correspondiente'.! !
+	^unHabitat! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'JMB 4/18/2022 18:54:17'!
-hacerQueElHabitatTengaLosRecursosSuficientes
-	"Implementar cuando sea necesario"! !
+!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/22/2022 17:17:22'!
+hacerQueElHabitatTengaLosRecursosSuficientes	unHabitat agregarAvispa: avispaOriana.! !
 
 !PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'JMB 4/19/2022 19:14:28'!
 laAvispaLara
 	Assert isTrue: false description: 'Reemplazar esto por la implementación correspondiente'.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'JMB 4/19/2022 19:14:33'!
+!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/22/2022 17:15:39'!
 laAvispaOriana
-	Assert isTrue: false description: 'Reemplazar esto por la implementación correspondiente'.! !
+	^avispaOriana! !
 
 !PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'JMB 4/19/2022 19:14:39'!
 laAvispaOrnella
@@ -261,6 +329,19 @@ queElHabitatTengaUnaOrugaMas
 queElHabitatTengaUnaPolillaMas
 	Assert isTrue: false description: 'Reemplazar esto por la implementación correspondiente'.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'JMB 4/18/2022 18:44:02'!
+!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/22/2022 18:10:17'!
 retrocederElHabitatAlInicioDeLosTiempos
-	"Implementar cuando sea necesario"! !
+	unHabitat retrocederAlInicioDeLosTiempos.
+	avispaOriana eliminarHuevos.! !
+
+
+!PruebasReproduccionDeAvispas class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 18:11:16'!
+initializeCollaboratorsFromFile
+	"Auto generated method for loading purposes - Do not modify it"
+
+	unHabitat := Habitat.
+	avispaOriana := AvispaOriana.! !
+
+AvispaOriana initializeAfterFileIn!
+Habitat initializeAfterFileIn!
+PruebasReproduccionDeAvispas initializeAfterFileIn!
