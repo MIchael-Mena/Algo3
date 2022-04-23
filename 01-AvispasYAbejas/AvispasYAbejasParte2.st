@@ -26,12 +26,12 @@ intentarReproducirse
 	! !
 
 
-!AvispaOriana class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 22:50:24'!
+!AvispaOriana class methodsFor: '--** private fileout/in **--' stamp: 'M 4/23/2022 18:57:53'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
 	unHabitat := nil.
-	huevos := 1.
+	huevos := 0.
 	orugas := 11.! !
 
 
@@ -56,12 +56,14 @@ cantidadDeHuevosDeAvispas
 cantidadDeOrugas
 	^Orugas cantidadOrugasVivas .! !
 
-!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 17:42:35'!
+!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/23/2022 18:07:34'!
 retrocederAlInicioDeLosTiempos
-	avispas := OrderedCollection new.! !
+	"avispas := OrderedCollection new."
+	AvispaOriana eliminarHuevos.
+	Orugas eliminarOrugas.! !
 
 
-!Habitat class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 22:50:24'!
+!Habitat class methodsFor: '--** private fileout/in **--' stamp: 'M 4/23/2022 18:57:53'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -86,11 +88,6 @@ Orugas class
 cantidadOrugasVivas
 	^orugasVivas ! !
 
-!Orugas class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 21:16:46'!
-consumirOruga
-	orugasVivas := orugasVivas - 1.
-	^true.! !
-
 !Orugas class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 22:45:45'!
 crearUnaCantidadOrugas: unaCantidadDeOrugas
 	orugasVivas := unaCantidadDeOrugas + orugasVivas.! !
@@ -99,16 +96,28 @@ crearUnaCantidadOrugas: unaCantidadDeOrugas
 eliminarOrugas
 	orugasVivas  := 0.! !
 
-!Orugas class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 22:40:58'!
+!Orugas class methodsFor: 'as yet unclassified' stamp: 'M 4/23/2022 18:29:43'!
 paraAlimentarse
-	orugasVivas > 0 ifTrue: [ ^ self consumirOruga] ifFalse: [ ^false. ].! !
+	"orugasVivas > 0 ifTrue: [ ^ self consumirOruga] ifFalse: [ ^false. ]."
+	^ self hayOrugas & self consumirOruga.
+	! !
 
 
-!Orugas class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 22:50:24'!
+!Orugas class methodsFor: 'private' stamp: 'M 4/22/2022 21:16:46'!
+consumirOruga
+	orugasVivas := orugasVivas - 1.
+	^true.! !
+
+!Orugas class methodsFor: 'private' stamp: 'M 4/23/2022 18:29:50'!
+hayOrugas
+	^orugasVivas > 0.! !
+
+
+!Orugas class methodsFor: '--** private fileout/in **--' stamp: 'M 4/23/2022 18:57:53'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
-	orugasVivas := 0.! !
+	orugasVivas := -1.! !
 
 
 !classDefinition: #PruebasReproduccionDeAvispas category: 'AvispasYAbejasParte2'!
@@ -192,65 +201,84 @@ test06CuandoNoHayOrugasOrianaLaAvispaNoPuedeDejarHuevos
 	Assert that: self habitat cantidadDeHuevosDeAvispas isEqualTo: 0.! !
 
 
-!PruebasReproduccionDeAvispas class methodsFor: 'tests - Ornella' stamp: 'JMB 4/21/2022 12:14:24'!
+!PruebasReproduccionDeAvispas class methodsFor: 'tests - Ornella' stamp: 'M 4/23/2022 18:51:17'!
 test07CuandoOrnellaLaAvispaSeReproduceDejaUnHuevo
+
 	self retrocederElHabitatAlInicioDeLosTiempos. 
+	
 	self hacerQueElHabitatTengaLosRecursosSuficientes.
 	
 	self laAvispaOrnella intentarReproducirse.
 	
+
 	Assert that: self habitat cantidadDeHuevosDeAvispas isEqualTo: 1.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'tests - Ornella' stamp: 'JMB 4/21/2022 12:14:18'!
+!PruebasReproduccionDeAvispas class methodsFor: 'tests - Ornella' stamp: 'M 4/23/2022 18:52:13'!
 test08ParaDejarUnHuevoOrnellaLaAvispaReduceLaPoblacionDeUnaOrugaANinguna
+
 	self retrocederElHabitatAlInicioDeLosTiempos.
+	
 	self queElHabitatTengaUnaOrugaMas.
 	
 	self laAvispaOrnella intentarReproducirse.
 	
+	
 	Assert that: self habitat cantidadDeOrugas isEqualTo: 0.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'tests - Ornella' stamp: 'JMB 4/21/2022 12:14:11'!
+!PruebasReproduccionDeAvispas class methodsFor: 'tests - Ornella' stamp: 'M 4/23/2022 18:52:43'!
 test09CuandoNoHayOrugasOrnellaLaAvispaNoPuedeDejarHuevos
+
 	self retrocederElHabitatAlInicioDeLosTiempos.
 	
 	self laAvispaOrnella intentarReproducirse.
 	
+	
 	Assert that: self habitat cantidadDeHuevosDeAvispas isEqualTo: 0.! !
 
 
-!PruebasReproduccionDeAvispas class methodsFor: 'tests - Polly' stamp: 'JMB 4/21/2022 12:14:46'!
+!PruebasReproduccionDeAvispas class methodsFor: 'tests - Polly' stamp: 'M 4/23/2022 18:53:25'!
 test10CuandoPollyLaAvispaSeReproduceDejaUnHuevo
+
 	self retrocederElHabitatAlInicioDeLosTiempos. 
+	
 	self hacerQueElHabitatTengaLosRecursosSuficientes.
 	
 	self laAvispaPolly intentarReproducirse.
 	
+	
 	Assert that: self habitat cantidadDeHuevosDeAvispas isEqualTo: 1.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'tests - Polly' stamp: 'JMB 4/21/2022 12:14:40'!
+!PruebasReproduccionDeAvispas class methodsFor: 'tests - Polly' stamp: 'M 4/23/2022 18:57:24'!
 test11ParaDejarUnHuevoPollyLaAvispaReduceLaPoblacionDeUnaPolillaANinguna
+
 	self retrocederElHabitatAlInicioDeLosTiempos.
+	
 	self queElHabitatTengaUnaPolillaMas.
 	
 	self laAvispaPolly intentarReproducirse.
 	
+
 	Assert that: self habitat cantidadDePolillas isEqualTo: 0.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'tests - Polly' stamp: 'JMB 4/21/2022 12:14:36'!
+!PruebasReproduccionDeAvispas class methodsFor: 'tests - Polly' stamp: 'M 4/23/2022 18:57:34'!
 test12ParaDejarUnHuevoPollyLaAvispaDecrementaEnUnoLaPoblacionDePolillasDelHabitat
+
 	self retrocederElHabitatAlInicioDeLosTiempos.
+	
 	self queElHabitatTengaDosPolillasMas.
 	
 	self laAvispaPolly intentarReproducirse.
 	
+	
 	Assert that: self habitat cantidadDePolillas isEqualTo: 1.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'tests - Polly' stamp: 'JMB 4/21/2022 12:14:30'!
+!PruebasReproduccionDeAvispas class methodsFor: 'tests - Polly' stamp: 'M 4/23/2022 18:57:42'!
 test13CuandoNoHayPolillasPollyLaAvispaNoPuedeDejarHuevos
+
 	self retrocederElHabitatAlInicioDeLosTiempos.
 	
 	self laAvispaPolly intentarReproducirse.
+	
 	
 	Assert that: self habitat cantidadDeHuevosDeAvispas isEqualTo: 0.! !
 
@@ -391,14 +419,14 @@ queElHabitatTengaUnaOrugaMas
 queElHabitatTengaUnaPolillaMas
 	Assert isTrue: false description: 'Reemplazar esto por la implementación correspondiente'.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/22/2022 20:59:27'!
+!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/23/2022 18:08:55'!
 retrocederElHabitatAlInicioDeLosTiempos
 	Habitat retrocederAlInicioDeLosTiempos.
-	AvispaOriana eliminarHuevos.
-	Orugas eliminarOrugas.! !
+	"AvispaOriana eliminarHuevos.
+	Orugas eliminarOrugas."! !
 
 
-!PruebasReproduccionDeAvispas class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 22:50:24'!
+!PruebasReproduccionDeAvispas class methodsFor: '--** private fileout/in **--' stamp: 'M 4/23/2022 18:57:54'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
