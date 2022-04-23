@@ -11,10 +11,6 @@ DenotativeObject subclass: #AvispaOriana
 AvispaOriana class
 	instanceVariableNames: 'unHabitat huevos orugas'!
 
-!AvispaOriana class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 20:02:34'!
-agregarOruga: unasOrugas
-	orugas := orugas + unasOrugas.! !
-
 !AvispaOriana class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 18:10:40'!
 eliminarHuevos
 	huevos := 0.! !
@@ -30,7 +26,7 @@ intentarReproducirse
 	! !
 
 
-!AvispaOriana class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 21:25:55'!
+!AvispaOriana class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 22:50:24'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -52,37 +48,24 @@ DenotativeObject subclass: #Habitat
 Habitat class
 	instanceVariableNames: 'avispas orugas'!
 
-!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 17:25:33'!
-agregarAvispa: unaAvispa
-	avispas add: unaAvispa! !
-
-!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 20:28:05'!
+!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 22:39:52'!
 cantidadDeHuevosDeAvispas
-	"|totalHuevos|
-	totalHuevos := 0.
-	avispas do: [:avispaActual | totalHuevos := (avispaActual huevosPuestos) + totalHuevos ].
-	^totalHuevos."
 	^AvispaOriana huevosPuestos.! !
 
 !Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 20:52:10'!
 cantidadDeOrugas
 	^Orugas cantidadOrugasVivas .! !
 
-!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 19:46:51'!
-crearOruga
-	orugas := orugas + 1.
-	^orugas.! !
-
 !Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 17:42:35'!
 retrocederAlInicioDeLosTiempos
 	avispas := OrderedCollection new.! !
 
 
-!Habitat class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 21:25:55'!
+!Habitat class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 22:50:24'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
-	avispas := ((OrderedCollection new) add: AvispaOriana; yourself).
+	avispas := ((OrderedCollection new)).
 	orugas := 6.! !
 
 
@@ -108,20 +91,20 @@ consumirOruga
 	orugasVivas := orugasVivas - 1.
 	^true.! !
 
-!Orugas class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 20:58:34'!
-crearOruga
-	orugasVivas := orugasVivas + 1.! !
+!Orugas class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 22:45:45'!
+crearUnaCantidadOrugas: unaCantidadDeOrugas
+	orugasVivas := unaCantidadDeOrugas + orugasVivas.! !
 
 !Orugas class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 21:02:06'!
 eliminarOrugas
 	orugasVivas  := 0.! !
 
-!Orugas class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 21:18:17'!
+!Orugas class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 22:40:58'!
 paraAlimentarse
 	orugasVivas > 0 ifTrue: [ ^ self consumirOruga] ifFalse: [ ^false. ].! !
 
 
-!Orugas class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 21:25:55'!
+!Orugas class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 22:50:24'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -141,59 +124,70 @@ DenotativeObject subclass: #PruebasReproduccionDeAvispas
 PruebasReproduccionDeAvispas class
 	instanceVariableNames: 'unaOrugas unasOrugas'!
 
-!PruebasReproduccionDeAvispas class methodsFor: 'tests - Oriana' stamp: 'JMB 4/18/2022 18:38:11'!
+!PruebasReproduccionDeAvispas class methodsFor: 'tests - Oriana' stamp: 'M 4/22/2022 22:48:03'!
 test01EnElInicioDeLosTiemposNoHayHuevos	
+
 	self retrocederElHabitatAlInicioDeLosTiempos.
 	
 	Assert that: self habitat cantidadDeHuevosDeAvispas isEqualTo: 0! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'tests - Oriana' stamp: 'M 4/22/2022 21:24:55'!
+!PruebasReproduccionDeAvispas class methodsFor: 'tests - Oriana' stamp: 'M 4/22/2022 22:47:55'!
 test02CuandoOrianaLaAvispaSeReproducePorPrimeraVezDejaUnHuevo
 
 	self retrocederElHabitatAlInicioDeLosTiempos. 
 	
 	self hacerQueElHabitatTengaLosRecursosSuficientes.
 	
-	"self queElHabitatTengaUnaOrugaMas."
-	
 	self laAvispaOriana intentarReproducirse.
 	
 	
 	Assert that: self habitat cantidadDeHuevosDeAvispas isEqualTo: 1.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'tests - Oriana' stamp: 'JMB 4/21/2022 12:12:11'!
+!PruebasReproduccionDeAvispas class methodsFor: 'tests - Oriana' stamp: 'M 4/22/2022 22:48:18'!
 test03CadaVezQueOrianaSeReproduceDejaUnHuevoMas
+
 	self retrocederElHabitatAlInicioDeLosTiempos. 
+	
 	self hacerQueElHabitatTengaLosRecursosSuficientes.
-	self laAvispaOriana intentarReproducirse.
 	
 	self laAvispaOriana intentarReproducirse.
 	
+	self laAvispaOriana intentarReproducirse.
+	
+
 	Assert that: self habitat cantidadDeHuevosDeAvispas isEqualTo: 2.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'tests - Oriana' stamp: 'JMB 4/21/2022 12:12:53'!
+!PruebasReproduccionDeAvispas class methodsFor: 'tests - Oriana' stamp: 'M 4/22/2022 22:48:47'!
 test04ParaDejarUnHuevoOrianaLaAvispaReduceLaPoblacionDeUnaOrugaANinguna
+
 	self retrocederElHabitatAlInicioDeLosTiempos.
+	
 	self queElHabitatTengaUnaOrugaMas.
 	
 	self laAvispaOriana intentarReproducirse.
 	
+	
 	Assert that: self habitat cantidadDeOrugas isEqualTo: 0.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'tests - Oriana' stamp: 'JMB 4/21/2022 12:13:43'!
+!PruebasReproduccionDeAvispas class methodsFor: 'tests - Oriana' stamp: 'M 4/22/2022 22:48:43'!
 test05ParaDejarUnHuevoOrianaLaAvispaDecrementaEnUnoLaPoblacionDeOrugasDelHabitat
+
 	self retrocederElHabitatAlInicioDeLosTiempos.
+	
 	self queElHabitatTengaDosOrugasMas.
 	
 	self laAvispaOriana intentarReproducirse.
 	
+	
 	Assert that: self habitat cantidadDeOrugas isEqualTo: 1.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'tests - Oriana' stamp: 'JMB 4/21/2022 12:13:22'!
+!PruebasReproduccionDeAvispas class methodsFor: 'tests - Oriana' stamp: 'M 4/22/2022 22:48:59'!
 test06CuandoNoHayOrugasOrianaLaAvispaNoPuedeDejarHuevos
+
 	self retrocederElHabitatAlInicioDeLosTiempos.
 	
 	self laAvispaOriana intentarReproducirse.
+	
 	
 	Assert that: self habitat cantidadDeHuevosDeAvispas isEqualTo: 0.! !
 
@@ -360,8 +354,9 @@ cantidadDeHuevosConLaFirmaGeneticaDePolly
 habitat
 	^Habitat! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/22/2022 20:21:24'!
-hacerQueElHabitatTengaLosRecursosSuficientes	Habitat agregarAvispa: AvispaOriana.! !
+!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/22/2022 22:47:14'!
+hacerQueElHabitatTengaLosRecursosSuficientes
+	Orugas crearUnaCantidadOrugas: 100! !
 
 !PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'JMB 4/19/2022 19:14:28'!
 laAvispaLara
@@ -379,18 +374,17 @@ laAvispaOrnella
 laAvispaPolly
 	Assert isTrue: false description: 'Reemplazar esto por la implementación correspondiente'.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/22/2022 21:09:16'!
+!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/22/2022 22:46:21'!
 queElHabitatTengaDosOrugasMas
-	Orugas crearOruga.
-	Orugas crearOruga.! !
+	Orugas crearUnaCantidadOrugas: 2.! !
 
 !PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'JMB 4/19/2022 19:15:33'!
 queElHabitatTengaDosPolillasMas
 	Assert isTrue: false description: 'Reemplazar esto por la implementación correspondiente'.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/22/2022 21:09:45'!
+!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/22/2022 22:46:12'!
 queElHabitatTengaUnaOrugaMas
-	Orugas crearOruga.
+	Orugas crearUnaCantidadOrugas: 1.
 	! !
 
 !PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'JMB 4/19/2022 19:15:42'!
@@ -404,7 +398,7 @@ retrocederElHabitatAlInicioDeLosTiempos
 	Orugas eliminarOrugas.! !
 
 
-!PruebasReproduccionDeAvispas class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 21:25:55'!
+!PruebasReproduccionDeAvispas class methodsFor: '--** private fileout/in **--' stamp: 'M 4/22/2022 22:50:24'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
