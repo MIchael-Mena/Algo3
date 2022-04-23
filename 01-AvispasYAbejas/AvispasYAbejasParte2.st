@@ -19,14 +19,14 @@ eliminarHuevos
 huevosPuestos
 	^huevos.! !
 
-!AvispaOriana class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 21:15:14'!
+!AvispaOriana class methodsFor: 'as yet unclassified' stamp: 'M 4/23/2022 19:17:03'!
 intentarReproducirse
-	Orugas paraAlimentarse ifTrue: [ huevos := huevos + 1 ].
-	
+	"Orugas paraAlimentarse ifTrue: [ huevos := huevos + 1 ]."
+	Habitat consumirUnaOruga ifTrue: [ huevos := huevos + 1 ].
 	! !
 
 
-!AvispaOriana class methodsFor: '--** private fileout/in **--' stamp: 'M 4/23/2022 18:57:53'!
+!AvispaOriana class methodsFor: '--** private fileout/in **--' stamp: 'M 4/23/2022 19:24:17'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -46,29 +46,45 @@ DenotativeObject subclass: #Habitat
 
 !classDefinition: 'Habitat class' category: 'AvispasYAbejasParte2'!
 Habitat class
-	instanceVariableNames: 'avispas orugas'!
+	instanceVariableNames: 'orugas'!
 
 !Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 22:39:52'!
 cantidadDeHuevosDeAvispas
 	^AvispaOriana huevosPuestos.! !
 
-!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/22/2022 20:52:10'!
+!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/23/2022 19:11:48'!
 cantidadDeOrugas
-	^Orugas cantidadOrugasVivas .! !
+	^orugas.! !
 
-!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/23/2022 18:07:34'!
+!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/23/2022 19:13:31'!
+consumirUnaOruga
+	^ self hayOrugas & self consumirOruga.! !
+
+!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/23/2022 19:11:20'!
+crearOrugas: unaCantidadDeOrugas
+	orugas  := orugas + unaCantidadDeOrugas.! !
+
+!Habitat class methodsFor: 'as yet unclassified' stamp: 'M 4/23/2022 19:18:08'!
 retrocederAlInicioDeLosTiempos
-	"avispas := OrderedCollection new."
 	AvispaOriana eliminarHuevos.
-	Orugas eliminarOrugas.! !
+	orugas := 0.! !
 
 
-!Habitat class methodsFor: '--** private fileout/in **--' stamp: 'M 4/23/2022 18:57:53'!
+!Habitat class methodsFor: 'private' stamp: 'M 4/23/2022 19:15:24'!
+consumirOruga
+	orugas := orugas - 1.
+	^true.! !
+
+!Habitat class methodsFor: 'private' stamp: 'M 4/23/2022 19:13:50'!
+hayOrugas
+	^orugas > 0.! !
+
+
+!Habitat class methodsFor: '--** private fileout/in **--' stamp: 'M 4/23/2022 19:24:17'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
-	avispas := ((OrderedCollection new)).
-	orugas := 6.! !
+	orugas := -1.! !
 
 
 !classDefinition: #Orugas category: 'AvispasYAbejasParte2'!
@@ -96,14 +112,13 @@ crearUnaCantidadOrugas: unaCantidadDeOrugas
 eliminarOrugas
 	orugasVivas  := 0.! !
 
-!Orugas class methodsFor: 'as yet unclassified' stamp: 'M 4/23/2022 18:29:43'!
+!Orugas class methodsFor: 'as yet unclassified' stamp: 'M 4/23/2022 19:12:23'!
 paraAlimentarse
-	"orugasVivas > 0 ifTrue: [ ^ self consumirOruga] ifFalse: [ ^false. ]."
 	^ self hayOrugas & self consumirOruga.
 	! !
 
 
-!Orugas class methodsFor: 'private' stamp: 'M 4/22/2022 21:16:46'!
+!Orugas class methodsFor: 'private' stamp: 'M 4/23/2022 19:14:06'!
 consumirOruga
 	orugasVivas := orugasVivas - 1.
 	^true.! !
@@ -113,11 +128,11 @@ hayOrugas
 	^orugasVivas > 0.! !
 
 
-!Orugas class methodsFor: '--** private fileout/in **--' stamp: 'M 4/23/2022 18:57:53'!
+!Orugas class methodsFor: '--** private fileout/in **--' stamp: 'M 4/23/2022 19:24:17'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
-	orugasVivas := -1.! !
+	orugasVivas := 609.! !
 
 
 !classDefinition: #PruebasReproduccionDeAvispas category: 'AvispasYAbejasParte2'!
@@ -382,9 +397,10 @@ cantidadDeHuevosConLaFirmaGeneticaDePolly
 habitat
 	^Habitat! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/22/2022 22:47:14'!
+!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/23/2022 19:22:49'!
 hacerQueElHabitatTengaLosRecursosSuficientes
-	Orugas crearUnaCantidadOrugas: 100! !
+	"Habitat cambiarARecursosSuficientes."
+	Habitat crearOrugas: 100.! !
 
 !PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'JMB 4/19/2022 19:14:28'!
 laAvispaLara
@@ -402,17 +418,19 @@ laAvispaOrnella
 laAvispaPolly
 	Assert isTrue: false description: 'Reemplazar esto por la implementación correspondiente'.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/22/2022 22:46:21'!
+!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/23/2022 19:23:49'!
 queElHabitatTengaDosOrugasMas
-	Orugas crearUnaCantidadOrugas: 2.! !
+	"Orugas crearUnaCantidadOrugas: 2."
+	Habitat  crearOrugas:  2.! !
 
 !PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'JMB 4/19/2022 19:15:33'!
 queElHabitatTengaDosPolillasMas
 	Assert isTrue: false description: 'Reemplazar esto por la implementación correspondiente'.! !
 
-!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/22/2022 22:46:12'!
+!PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'M 4/23/2022 19:23:35'!
 queElHabitatTengaUnaOrugaMas
-	Orugas crearUnaCantidadOrugas: 1.
+	"Orugas crearUnaCantidadOrugas: 1."
+	Habitat crearOrugas: 1.
 	! !
 
 !PruebasReproduccionDeAvispas class methodsFor: 'Para completar' stamp: 'JMB 4/19/2022 19:15:42'!
@@ -426,7 +444,7 @@ retrocederElHabitatAlInicioDeLosTiempos
 	Orugas eliminarOrugas."! !
 
 
-!PruebasReproduccionDeAvispas class methodsFor: '--** private fileout/in **--' stamp: 'M 4/23/2022 18:57:54'!
+!PruebasReproduccionDeAvispas class methodsFor: '--** private fileout/in **--' stamp: 'M 4/23/2022 19:24:17'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
