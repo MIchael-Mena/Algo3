@@ -1,0 +1,16 @@
+PREGUNTAS PARA DESPUES DE HACER EL EJERCICIO
+
+SOBRE IMPLEMENTAR FUNCIONALIDAD
+Al comienzo del trabajo, los primeros 3 tres fueron pasando uno a uno. Una vez más adelantados en el trabajo se puede ver a simple vista que si hubiéramos comenzado por el test03 podríamos 
+haber hecho que funcionen correctamente los test 01, 02 y 03 al mismo tiempo sin ningún problema. Pensamos que al implementar los test uno por uno el código que necesitas para que funcionen es
+mínimo y por lo tanto más fácil de realizar, aunque en cada paso puede que haya que realizar cambios al modelo de dominio, pero seguramente serán menores en comparación a tratar de resolver todos los test juntos.
+
+SOBRE CÓDIGO REPETIDO / SOBRE CÓDIGO REPETIDO 2
+	Para comenzar, nos quedó código repetido sobre los objetos "Avispas" cada una de ella respondía a una serie de mensajes que tenían el mismo fin. Implementamos lo visto en la última clase sobre prototipos, 
+creando el objeto "AvispaOriana" como padre y las demás avispas ("AvispaOrnella", "AvispaPolly", "AvispaLara") como hijos.
+	En nuestro modelo el hábitat es el responsable de controlar los recursos ya sean de orugas o polillas (la cantidad de insectos que se pueda crear), y a su vez orugas y polillas son responsables de saber 
+cuantas tiene cada una. Creemos que si las avispas tuvieran acceso directamente a la cantidad de polillas y orugas se estaría violando el encapsulamiento de estas.
+	En nuestro caso, en la resolución para guardar los huevos utilizamos un colaborador "huevos = 0", no utilizamos la función de diccionarios o colecciones. Nuestra idea fue que cada avispa tenga su respectiva cantidad 
+de huevos en su colaborador correspondiente y asi hacer llamado del mismo con el método "huevosPuestos" ubicado en el padre de las avispas ("AvispaOriana").
+	Para resolver la firma genética si hicimos uso de diccionario poniendo como clave un string que representaría la firma de cada huevo que se creaba (cada avispa es responsable de crear su firma) y como valor un contador.
+
