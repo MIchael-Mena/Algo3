@@ -21,30 +21,22 @@ TestCase subclass: #CustomerBookTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'M 4/28/2022 22:58:24'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'M 4/29/2022 20:42:37'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
-
-	| customerBook millisecondsBeforeRunning millisecondsAfterRunning |
-	
+	| intervaloTiempo customerBook |
 	
 	customerBook := CustomerBook new.
 	
-	millisecondsBeforeRunning := Time millisecondClockValue * millisecond.
+	intervaloTiempo := Tiempo ejecucion: [ customerBook addCustomerNamed: 'John Lennon'. ].
 	
-	customerBook addCustomerNamed: 'John Lennon'.
-	
-	millisecondsAfterRunning := Time millisecondClockValue * millisecond.
-	
-	
-	self assert: (millisecondsAfterRunning-millisecondsBeforeRunning) < (50 * millisecond)! !
+	self assert: (intervaloTiempo) < (50 * millisecond)
+! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'M 4/28/2022 22:58:51'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'M 4/29/2022 20:43:03'!
 test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 
-
-	| customerBook millisecondsBeforeRunning millisecondsAfterRunning paulMcCartney |
-	
+	| intervaloTiempo customerBook paulMcCartney |
 	
 	customerBook := CustomerBook new.
 	
@@ -52,14 +44,9 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	
 	customerBook addCustomerNamed: paulMcCartney.
 	
-	millisecondsBeforeRunning := Time millisecondClockValue * millisecond.
+	intervaloTiempo := Tiempo ejecucion: [ customerBook removeCustomerNamed: paulMcCartney.].
 	
-	customerBook removeCustomerNamed: paulMcCartney.
-	
-	millisecondsAfterRunning := Time millisecondClockValue * millisecond.
-	
-	
-	self assert: (millisecondsAfterRunning-millisecondsBeforeRunning) < (100 * millisecond)
+	self assert: (intervaloTiempo) < (100 * millisecond).
 ! !
 
 !CustomerBookTest methodsFor: 'testing' stamp: 'M 4/28/2022 22:59:12'!
@@ -235,12 +222,15 @@ initialize
 	suspended:= OrderedCollection new.! !
 
 
-!CustomerBook methodsFor: 'customer management' stamp: 'M 4/28/2022 23:03:29'!
+!CustomerBook methodsFor: 'customer management' stamp: 'M 4/29/2022 19:38:57'!
 addCustomerNamed: aName
 
 	aName isEmpty ifTrue: [ self signalCustomerNameCannotBeEmpty ].
 	
+	"self checkNameCustomer"
+	
 	((active includes: aName) or: [suspended includes: aName]) ifTrue: [ self signalCustomerAlreadyExists ].
+	
 	
 	active add: aName ! !
 
@@ -259,7 +249,7 @@ numberOfSuspendedCustomers
 
 	^suspended size! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'M 4/28/2022 23:04:27'!
+!CustomerBook methodsFor: 'customer management' stamp: 'M 4/29/2022 19:53:26'!
 removeCustomerNamed: aName 
 
 	1 to: active size do: 
@@ -282,7 +272,9 @@ removeCustomerNamed: aName
 	].
 
 	^ NotFound signal.
-! !
+
+	"active remove: aName ifAbsent: [ ^NotFound signal].
+	suspended remove: aName ifAbsent: [ ^NotFound signal]."! !
 
 !CustomerBook methodsFor: 'customer management' stamp: 'M 4/28/2022 23:04:31'!
 signalCustomerAlreadyExists 
@@ -318,3 +310,29 @@ customerAlreadyExistsErrorMessage
 customerCanNotBeEmptyErrorMessage
 
 	^'Customer Name Cannot Be Empty'! !
+
+
+!classDefinition: #Tiempo category: 'CodigoRepetido-Ejercicio'!
+Object subclass: #Tiempo
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'CodigoRepetido-Ejercicio'!
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Tiempo class' category: 'CodigoRepetido-Ejercicio'!
+Tiempo class
+	instanceVariableNames: ''!
+
+!Tiempo class methodsFor: 'as yet unclassified' stamp: 'M 4/29/2022 20:42:18'!
+ejecucion: unBloque
+	| millisecondsBeforeRunning millisecondsAfterRunning |
+	
+	millisecondsBeforeRunning := Time millisecondClockValue * millisecond.
+	
+	unBloque value.
+	
+	millisecondsAfterRunning := Time millisecondClockValue * millisecond.
+	
+	^ (millisecondsAfterRunning - millisecondsBeforeRunning).! !
