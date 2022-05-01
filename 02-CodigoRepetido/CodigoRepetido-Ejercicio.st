@@ -21,19 +21,19 @@ TestCase subclass: #CustomerBookTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'M 4/29/2022 20:42:37'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'M 4/30/2022 18:49:50'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
 	| intervaloTiempo customerBook |
 	
 	customerBook := CustomerBook new.
 	
-	intervaloTiempo := Tiempo ejecucion: [ customerBook addCustomerNamed: 'John Lennon'. ].
+	intervaloTiempo := Tiempo calcularIntervalo: [ customerBook addCustomerNamed: 'John Lennon'. ].
 	
 	self assert: (intervaloTiempo) < (50 * millisecond)
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'M 4/29/2022 20:43:03'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'M 4/30/2022 18:50:47'!
 test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 
 	| intervaloTiempo customerBook paulMcCartney |
@@ -44,7 +44,7 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	
 	customerBook addCustomerNamed: paulMcCartney.
 	
-	intervaloTiempo := Tiempo ejecucion: [ customerBook removeCustomerNamed: paulMcCartney.].
+	intervaloTiempo := Tiempo calcularIntervalo: [ customerBook removeCustomerNamed: paulMcCartney.].
 	
 	self assert: (intervaloTiempo) < (100 * millisecond).
 ! !
@@ -194,106 +194,116 @@ test08CanNotSuspendAnAlreadySuspendedCustomer
 			self assert: (customerBook includesCustomerNamed: johnLennon) ]! !
 
 
-!classDefinition: #CustomerBook category: 'CodigoRepetido-Ejercicio'!
-Object subclass: #CustomerBook
-	instanceVariableNames: 'suspended active'
+!classDefinition: #Activo category: 'CodigoRepetido-Ejercicio'!
+Object subclass: #Activo
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!CustomerBook methodsFor: 'testing' stamp: 'M 4/28/2022 23:03:11'!
+!Activo methodsFor: 'as yet unclassified' stamp: 'M 4/30/2022 19:16:44'!
+estaActivo
+	^true.! !
+
+!Activo methodsFor: 'as yet unclassified' stamp: 'M 4/30/2022 19:21:26'!
+estaSuspendido
+	^ false.! !
+
+
+!classDefinition: #CustomerBook category: 'CodigoRepetido-Ejercicio'!
+Object subclass: #CustomerBook
+	instanceVariableNames: 'suspended active clientes'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'CodigoRepetido-Ejercicio'!
+
+!CustomerBook methodsFor: 'testing' stamp: 'M 5/1/2022 19:57:29'!
+clienteEstaSuspendido: aName
+	( (clientes at: aName) estaSuspendido) ifTrue: [ ^CantSuspend signal ].! !
+
+!CustomerBook methodsFor: 'testing' stamp: 'M 5/1/2022 20:04:35'!
+clienteInexistente: aName
+	( clientes includesKey: aName ) ifFalse: [ ^CantSuspend signal ].! !
+
+!CustomerBook methodsFor: 'testing' stamp: 'M 5/1/2022 19:43:14'!
+existeCliente: aName
+
+	(clientes includesKey: aName) ifTrue: [ self signalCustomerAlreadyExists ].! !
+
+!CustomerBook methodsFor: 'testing' stamp: 'M 5/1/2022 19:43:31'!
 includesCustomerNamed: aName
+	
+	^ clientes includesKey: aName.! !
 
-	^(active includes: aName) or: [ suspended includes: aName ]! !
-
-!CustomerBook methodsFor: 'testing' stamp: 'M 4/28/2022 23:03:15'!
+!CustomerBook methodsFor: 'testing' stamp: 'M 5/1/2022 19:43:26'!
 isEmpty
+	
+	^ clientes isEmpty.! !
 
-	^active isEmpty and: [ suspended isEmpty ]! !
 
-
-!CustomerBook methodsFor: 'initialization' stamp: 'M 4/28/2022 23:03:21'!
+!CustomerBook methodsFor: 'initialization' stamp: 'M 5/1/2022 20:05:50'!
 initialize
-
 	super initialize.
 	
-	active := OrderedCollection new.
-	
-	suspended:= OrderedCollection new.! !
+	clientes := Dictionary new.! !
 
 
-!CustomerBook methodsFor: 'customer management' stamp: 'M 4/29/2022 19:38:57'!
+!CustomerBook methodsFor: 'customer management' stamp: 'M 5/1/2022 19:43:20'!
 addCustomerNamed: aName
 
-	aName isEmpty ifTrue: [ self signalCustomerNameCannotBeEmpty ].
+	self checkNameCustomer: aName.
 	
-	"self checkNameCustomer"
+	self existeCliente: aName.
 	
-	((active includes: aName) or: [suspended includes: aName]) ifTrue: [ self signalCustomerAlreadyExists ].
-	
-	
-	active add: aName ! !
+	clientes at: aName put: (Activo new).! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'M 4/28/2022 23:03:33'!
+!CustomerBook methodsFor: 'customer management' stamp: 'M 4/30/2022 18:57:44'!
+checkNameCustomer: aName
+
+	^ aName isEmpty ifTrue: [ self signalCustomerNameCannotBeEmpty ]! !
+
+!CustomerBook methodsFor: 'customer management' stamp: 'M 5/1/2022 19:43:10'!
 numberOfActiveCustomers
 
-	^active size! !
+	^ (clientes select: [ :unEstadoDeCliente  |  unEstadoDeCliente estaActivo  ] ) size.
+! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'M 4/28/2022 23:03:36'!
+!CustomerBook methodsFor: 'customer management' stamp: 'M 5/1/2022 19:43:06'!
 numberOfCustomers
 
-	^active size + suspended size! !
+	^ clientes size.! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'M 4/28/2022 23:03:40'!
+!CustomerBook methodsFor: 'customer management' stamp: 'M 5/1/2022 19:43:00'!
 numberOfSuspendedCustomers
 
-	^suspended size! !
+	^ (clientes select: [ :unEstadoDeCliente  |  unEstadoDeCliente estaSuspendido  ] ) size.! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'M 4/29/2022 19:53:26'!
+!CustomerBook methodsFor: 'customer management' stamp: 'M 5/1/2022 19:42:47'!
 removeCustomerNamed: aName 
 
-	1 to: active size do: 
-	
-	[ :index |	
-		aName = (active at: index)
-			ifTrue: [		
-				active removeAt: index.
-				^ aName
-			] 
-	].
-
-	1 to: suspended size do: 
-	[ :index |
-		aName = (suspended at: index)
-			ifTrue: [
-				suspended removeAt: index.
-				^ aName 
-			] 
-	].
-
-	^ NotFound signal.
-
-	"active remove: aName ifAbsent: [ ^NotFound signal].
-	suspended remove: aName ifAbsent: [ ^NotFound signal]."! !
+	clientes removeKey: aName ifAbsent: [ ^ NotFound signal ].! !
 
 !CustomerBook methodsFor: 'customer management' stamp: 'M 4/28/2022 23:04:31'!
 signalCustomerAlreadyExists 
 
 	self error: self class customerAlreadyExistsErrorMessage! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'M 4/28/2022 23:04:34'!
+!CustomerBook methodsFor: 'customer management' stamp: 'M 5/1/2022 19:42:53'!
 signalCustomerNameCannotBeEmpty 
 
 	self error: self class customerCanNotBeEmptyErrorMessage ! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'M 4/28/2022 23:04:45'!
+!CustomerBook methodsFor: 'customer management' stamp: 'M 5/1/2022 20:04:56'!
 suspendCustomerNamed: aName 
 
-	(active includes: aName) ifFalse: [^CantSuspend signal].
+	self checkNameCustomer: aName.
 	
-	active remove: aName.
+	self clienteInexistente: aName.
 	
-	suspended add: aName! !
+	self clienteEstaSuspendido: aName.
+	
+	clientes at: aName put: (Suspendido new).
+! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -301,15 +311,32 @@ suspendCustomerNamed: aName
 CustomerBook class
 	instanceVariableNames: ''!
 
-!CustomerBook class methodsFor: 'error messages' stamp: 'NR 4/30/2020 09:05:18'!
+!CustomerBook class methodsFor: 'error messages' stamp: 'M 4/30/2022 18:53:00'!
 customerAlreadyExistsErrorMessage
 
-	^'Customer Already Exists'! !
+	^'Customer Already Exists'
+! !
 
-!CustomerBook class methodsFor: 'error messages' stamp: 'NR 4/30/2020 09:05:25'!
+!CustomerBook class methodsFor: 'error messages' stamp: 'M 4/30/2022 19:52:08'!
 customerCanNotBeEmptyErrorMessage
 
 	^'Customer Name Cannot Be Empty'! !
+
+
+!classDefinition: #Suspendido category: 'CodigoRepetido-Ejercicio'!
+Object subclass: #Suspendido
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'CodigoRepetido-Ejercicio'!
+
+!Suspendido methodsFor: 'as yet unclassified' stamp: 'M 4/30/2022 19:17:48'!
+estaActivo
+	^false.! !
+
+!Suspendido methodsFor: 'as yet unclassified' stamp: 'M 4/30/2022 19:21:41'!
+estaSuspendido
+	^ true .! !
 
 
 !classDefinition: #Tiempo category: 'CodigoRepetido-Ejercicio'!
@@ -325,8 +352,8 @@ Object subclass: #Tiempo
 Tiempo class
 	instanceVariableNames: ''!
 
-!Tiempo class methodsFor: 'as yet unclassified' stamp: 'M 4/29/2022 20:42:18'!
-ejecucion: unBloque
+!Tiempo class methodsFor: 'as yet unclassified' stamp: 'M 4/30/2022 18:50:59'!
+calcularIntervalo: unBloque
 	| millisecondsBeforeRunning millisecondsAfterRunning |
 	
 	millisecondsBeforeRunning := Time millisecondClockValue * millisecond.
