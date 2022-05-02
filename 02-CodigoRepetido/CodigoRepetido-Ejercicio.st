@@ -194,22 +194,6 @@ test08CanNotSuspendAnAlreadySuspendedCustomer
 			self assert: (customerBook includesCustomerNamed: johnLennon) ]! !
 
 
-!classDefinition: #Activo category: 'CodigoRepetido-Ejercicio'!
-Object subclass: #Activo
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'CodigoRepetido-Ejercicio'!
-
-!Activo methodsFor: 'as yet unclassified' stamp: 'M 4/30/2022 19:16:44'!
-estaActivo
-	^true.! !
-
-!Activo methodsFor: 'as yet unclassified' stamp: 'M 4/30/2022 19:21:26'!
-estaSuspendido
-	^ false.! !
-
-
 !classDefinition: #CustomerBook category: 'CodigoRepetido-Ejercicio'!
 Object subclass: #CustomerBook
 	instanceVariableNames: 'suspended active clientes'
@@ -217,13 +201,15 @@ Object subclass: #CustomerBook
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!CustomerBook methodsFor: 'testing' stamp: 'M 5/1/2022 19:57:29'!
-clienteEstaSuspendido: aName
-	( (clientes at: aName) estaSuspendido) ifTrue: [ ^CantSuspend signal ].! !
-
-!CustomerBook methodsFor: 'testing' stamp: 'M 5/1/2022 20:04:35'!
+!CustomerBook methodsFor: 'testing' stamp: 'M 5/2/2022 12:52:44'!
 clienteInexistente: aName
+
 	( clientes includesKey: aName ) ifFalse: [ ^CantSuspend signal ].! !
+
+!CustomerBook methodsFor: 'testing' stamp: 'M 5/2/2022 12:52:47'!
+clienteSuspendido: aName
+
+	( (clientes at: aName) estaSuspendido) ifTrue: [ ^CantSuspend signal ].! !
 
 !CustomerBook methodsFor: 'testing' stamp: 'M 5/1/2022 19:43:14'!
 existeCliente: aName
@@ -293,14 +279,14 @@ signalCustomerNameCannotBeEmpty
 
 	self error: self class customerCanNotBeEmptyErrorMessage ! !
 
-!CustomerBook methodsFor: 'customer management' stamp: 'M 5/1/2022 20:04:56'!
+!CustomerBook methodsFor: 'customer management' stamp: 'M 5/2/2022 12:50:23'!
 suspendCustomerNamed: aName 
 
 	self checkNameCustomer: aName.
 	
 	self clienteInexistente: aName.
 	
-	self clienteEstaSuspendido: aName.
+	self clienteSuspendido: aName.
 	
 	clientes at: aName put: (Suspendido new).
 ! !
@@ -323,8 +309,40 @@ customerCanNotBeEmptyErrorMessage
 	^'Customer Name Cannot Be Empty'! !
 
 
+!classDefinition: #Estado category: 'CodigoRepetido-Ejercicio'!
+Object subclass: #Estado
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'CodigoRepetido-Ejercicio'!
+
+!Estado methodsFor: 'as yet unclassified' stamp: 'M 5/2/2022 12:45:43'!
+estaActivo
+	self subclassResponsibility.! !
+
+!Estado methodsFor: 'as yet unclassified' stamp: 'M 5/2/2022 12:45:59'!
+estaSuspendido
+	self subclassResponsibility.! !
+
+
+!classDefinition: #Activo category: 'CodigoRepetido-Ejercicio'!
+Estado subclass: #Activo
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'CodigoRepetido-Ejercicio'!
+
+!Activo methodsFor: 'as yet unclassified' stamp: 'M 4/30/2022 19:16:44'!
+estaActivo
+	^true.! !
+
+!Activo methodsFor: 'as yet unclassified' stamp: 'M 4/30/2022 19:21:26'!
+estaSuspendido
+	^ false.! !
+
+
 !classDefinition: #Suspendido category: 'CodigoRepetido-Ejercicio'!
-Object subclass: #Suspendido
+Estado subclass: #Suspendido
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
