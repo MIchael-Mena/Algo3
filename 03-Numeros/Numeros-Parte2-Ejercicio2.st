@@ -367,8 +367,8 @@ invalidNumberType
 	self error: self class invalidNumberTypeErrorDescription! !
 
 
-!Numero methodsFor: 'as yet unclassified' stamp: 'M 5/6/2022 20:38:40'!
-beAddedToAFraction: anAddend
+!Numero methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 14:06:54'!
+beAddedToAFraction: anAugend
 
 	self subclassResponsibility ! !
 
@@ -377,23 +377,23 @@ beAddedToAnEntero: anAugend
 
 	self subclassResponsibility ! !
 
-!Numero methodsFor: 'as yet unclassified' stamp: 'M 5/6/2022 21:10:30'!
-serDivididoConEntero: unEntero
+!Numero methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 14:06:13'!
+serDivididoConEntero: aQuotientEntero
 
 	self subclassResponsibility.! !
 
-!Numero methodsFor: 'as yet unclassified' stamp: 'M 5/6/2022 20:44:03'!
-serDivididoConFraccion: unaFraccion
+!Numero methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 14:06:08'!
+serDivididoConFraccion: aQuotientFraccion
 
 	self subclassResponsibility ! !
 
-!Numero methodsFor: 'as yet unclassified' stamp: 'M 5/6/2022 20:44:09'!
-serMulitplicadoConEntero: unEntero
+!Numero methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 14:05:56'!
+serMulitplicadoConEntero: aMultiplierEntero
 
 	self subclassResponsibility ! !
 
-!Numero methodsFor: 'as yet unclassified' stamp: 'M 5/6/2022 20:44:16'!
-serMultiplicadoConFraccion: unaFraccion
+!Numero methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 14:06:02'!
+serMultiplicadoConFraccion: aMultiplierFraccion
 
 	self subclassResponsibility ! !
 
@@ -592,10 +592,10 @@ serMultiplicadoConFraccion: aMultiplierFraccion
 
 	^ ((self * aMultiplierFraccion  numerator ) / aMultiplierFraccion denominator)! !
 
-!Entero methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 13:31:24'!
-serRestadoConEntero: aMinuendFraccionEntero
+!Entero methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 14:05:00'!
+serRestadoConEntero: aMinuendEntero
 
-	^self class with: aMinuendFraccionEntero integerValue - value ! !
+	^self class with: aMinuendEntero integerValue - value ! !
 
 !Entero methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 13:12:54'!
 serRestadoConFraccion: aMinuendFraccion
@@ -764,14 +764,14 @@ printOn: aStream
 		print: denominator ! !
 
 
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'M 5/6/2022 20:16:08'!
-beAddedToAFraction: anAddend
+!Fraccion methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 14:06:46'!
+beAddedToAFraction: anAugend
 
 	| newNumerator newDenominator |
 	
-	newNumerator := (numerator * anAddend denominator) + (denominator * anAddend numerator).
+	newNumerator := (numerator * anAugend denominator) + (denominator * anAugend numerator).
 	
-	newDenominator := denominator * anAddend denominator.
+	newDenominator := denominator * anAugend denominator.
 	
 	^newNumerator / newDenominator  ! !
 
@@ -780,42 +780,42 @@ beAddedToAnEntero: anAugend
 
 	^(anAugend  * self denominator) + self numerator / self denominator ! !
 
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'M 5/6/2022 21:02:26'!
-serDivididoConEntero: unEntero
+!Fraccion methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 14:04:13'!
+serDivididoConEntero: aQuotientEntero
 
-	^ Fraccion with: (self denominator  * unEntero) over: self numerator.
+	^ Fraccion with: (self denominator  * aQuotientEntero) over: self numerator.
 	
 	"El orden de la division es este ya que es el entero el que se divide por la fraccion"
 	! !
 
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'M 5/6/2022 20:15:00'!
-serDivididoConFraccion: unaFraccion
+!Fraccion methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 14:04:25'!
+serDivididoConFraccion: aQuotientFraccion
 
-	^(unaFraccion numerator * self denominator) / (unaFraccion denominator * self numerator)! !
+	^(aQuotientFraccion numerator * self denominator) / (aQuotientFraccion denominator * self numerator)! !
 
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'M 5/6/2022 20:12:27'!
-serMulitplicadoConEntero: unEntero
+!Fraccion methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 14:04:37'!
+serMulitplicadoConEntero: aMultiplierEntero
 
-	^ ((self numerator * unEntero ) / self denominator)! !
+	^ ((self numerator * aMultiplierEntero ) / self denominator)! !
 
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'M 5/6/2022 20:13:11'!
-serMultiplicadoConFraccion: unaFraccion
+!Fraccion methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 14:04:48'!
+serMultiplicadoConFraccion: aMultiplierFraccion
 
-	^ (unaFraccion numerator * self numerator ) / (unaFraccion denominator * self denominator) ! !
+	^ (aMultiplierFraccion numerator * self numerator ) / (aMultiplierFraccion denominator * self denominator) ! !
 
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'M 5/6/2022 20:13:29'!
-serRestadoConEntero: unEntero
+!Fraccion methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 14:05:27'!
+serRestadoConEntero: aMinuendEntero
 
-	^ ( (unEntero * self denominator) - (self numerator ) )/ self denominator ! !
+	^ ( (aMinuendEntero * self denominator) - (self numerator ) )/ self denominator ! !
 
-!Fraccion methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 13:08:33'!
-serRestadoConFraccion: aSubtrahendFraccion
+!Fraccion methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 14:05:42'!
+serRestadoConFraccion: aMinuendFraccion
 
 	| newNumerator newDenominator |
 	
-	newNumerator := (aSubtrahendFraccion numerator * self denominator) - (aSubtrahendFraccion denominator * self numerator).
+	newNumerator := (aMinuendFraccion numerator * self denominator) - (aMinuendFraccion denominator * self numerator).
 	
-	newDenominator := aSubtrahendFraccion denominator * self denominator.
+	newDenominator := aMinuendFraccion denominator * self denominator.
 	
 	^newNumerator / newDenominator! !
 
