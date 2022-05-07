@@ -312,38 +312,6 @@ setUp
 	! !
 
 
-!classDefinition: #FibonaciNegative category: 'Numeros-Parte2-Ejercicio'!
-Object subclass: #FibonaciNegative
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numeros-Parte2-Ejercicio'!
-
-
-!classDefinition: #FibonaciOne category: 'Numeros-Parte2-Ejercicio'!
-Object subclass: #FibonaciOne
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numeros-Parte2-Ejercicio'!
-
-
-!classDefinition: #FibonaciPositive category: 'Numeros-Parte2-Ejercicio'!
-Object subclass: #FibonaciPositive
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numeros-Parte2-Ejercicio'!
-
-
-!classDefinition: #FibonaciZero category: 'Numeros-Parte2-Ejercicio'!
-Object subclass: #FibonaciZero
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Numeros-Parte2-Ejercicio'!
-
-
 !classDefinition: #Numero category: 'Numeros-Parte2-Ejercicio'!
 Object subclass: #Numero
 	instanceVariableNames: ''
@@ -429,8 +397,13 @@ serMultiplicadoConFraccion: unaFraccion
 
 	self subclassResponsibility ! !
 
-!Numero methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 12:59:42'!
-serRestadoConEntero: unEntero
+!Numero methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 13:22:50'!
+serRestadoConEntero: aQuotientEntero
+
+	self subclassResponsibility ! !
+
+!Numero methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 13:22:40'!
+serRestadoConFraccion: aQuotientFraccion
 
 	self subclassResponsibility ! !
 
@@ -500,7 +473,7 @@ Numero subclass: #Entero
 	
 	(aDivisor isKindOf: Fraccion ) ifTrue: [^ Fraccion with: (self denominator  * unEntero) over: self numerator ]."! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'M 5/7/2022 12:49:37'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'M 5/7/2022 14:00:52'!
 fibonacci
 
 	| one two |
@@ -619,10 +592,10 @@ serMultiplicadoConFraccion: aMultiplierFraccion
 
 	^ ((self * aMultiplierFraccion  numerator ) / aMultiplierFraccion denominator)! !
 
-!Entero methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 13:13:08'!
-serRestadoConEntero: aaMinuendFraccionEntero
+!Entero methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 13:31:24'!
+serRestadoConEntero: aMinuendFraccionEntero
 
-	^self class with: aaMinuendFraccionEntero integerValue - value ! !
+	^self class with: aMinuendFraccionEntero integerValue - value ! !
 
 !Entero methodsFor: 'as yet unclassified' stamp: 'M 5/7/2022 13:12:54'!
 serRestadoConFraccion: aMinuendFraccion
