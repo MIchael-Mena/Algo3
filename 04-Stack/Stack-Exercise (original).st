@@ -1,11 +1,11 @@
-!classDefinition: #OOStackTest category: 'Stack-Exercise'!
+!classDefinition: #OOStackTest category: #'Stack-Exercise'!
 TestCase subclass: #OOStackTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 19:44:56'!
+!OOStackTest methodsFor: 'test' stamp: 'HernanWilkinson 5/7/2012 11:30'!
 test01StackShouldBeEmptyWhenCreated
 
 	| stack |
@@ -14,73 +14,61 @@ test01StackShouldBeEmptyWhenCreated
 	
 	self assert: stack isEmpty! !
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 19:41:14'!
+!OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:29:55'!
 test02PushAddElementsToTheStack
 
 	| stack |
 	
 	stack := OOStack new.
-	
 	stack push: 'something'.
 	
 	self deny: stack isEmpty! !
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 19:41:25'!
+!OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:30:01'!
 test03PopRemovesElementsFromTheStack
 
 	| stack |
 	
 	stack := OOStack new.
-	
 	stack push: 'something'.
-	
 	stack pop.
-	
 	
 	self assert: stack isEmpty! !
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 19:43:58'!
+!OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:30:09'!
 test04PopReturnsLastPushedObject
 
 	| stack pushedObject |
 	
 	stack := OOStack new.
-	
 	pushedObject := 'something'.
-	
 	stack push: pushedObject.
 	
 	self assert: stack pop = pushedObject! !
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 19:57:02'!
+!OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:30:48'!
 test05StackBehavesLIFO
 
 	| stack firstPushedObject secondPushedObject |
 	
 	stack := OOStack new.
-	
 	firstPushedObject := 'first'.
-	
 	secondPushedObject := 'second'.
 	
 	stack push: firstPushedObject.
-	
 	stack push: secondPushedObject.
 	
-	
 	self assert: stack pop = secondPushedObject.
-	
 	self assert: stack pop = firstPushedObject.
-	
-	self assert: stack isEmpty! !
+	self assert: stack isEmpty 
+	! !
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 19:57:31'!
+!OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:30:20'!
 test06TopReturnsLastPushedObject
 
 	| stack pushedObject |
 	
 	stack := OOStack new.
-	
 	pushedObject := 'something'.
 	
 	stack push: pushedObject.
@@ -88,84 +76,68 @@ test06TopReturnsLastPushedObject
 	self assert: stack top = pushedObject.
 	! !
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 19:59:49'!
+!OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:30:24'!
 test07TopDoesNotRemoveObjectFromStack
 
 	| stack pushedObject |
 	
 	stack := OOStack new.
-	
 	pushedObject := 'something'.
 	
 	stack push: pushedObject.
 	
-	
 	self assert: stack size = 1.
-	
 	stack top.
-	
-	self assert: stack size = 1.! !
+	self assert: stack size = 1.
+	! !
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 19:43:16'!
+!OOStackTest methodsFor: 'test' stamp: 'HAW 4/14/2017 22:48:26'!
 test08CanNotPopWhenThereAreNoObjectsInTheStack
 
 	| stack  |
 	
 	stack := OOStack new.
-	
 	self
-	
 		should: [ stack pop ]
-		
 		raise: Error - MessageNotUnderstood 
-		
 		withExceptionDo: [ :anError |
-			
 			self assert: anError messageText = OOStack stackEmptyErrorDescription ]
+		
 ! !
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 20:14:07'!
+!OOStackTest methodsFor: 'test' stamp: 'NR 5/13/2020 13:30:31'!
 test09CanNotPopWhenThereAreNoObjectsInTheStackAndTheStackHadObjects
 
 	| stack  |
 	
 	stack := OOStack new.
-	
 	stack push: 'something'.
-	
 	stack pop.
 	
 	self
-
 		should: [ stack pop ]
-		
 		raise: Error - MessageNotUnderstood 
-		
 		withExceptionDo: [ :anError |
-			
 			self assert: anError messageText = OOStack stackEmptyErrorDescription ]
+		
 ! !
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 19:42:10'!
+!OOStackTest methodsFor: 'test' stamp: 'HAW 4/14/2017 22:48:44'!
 test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 	| stack  |
 	
 	stack := OOStack new.
-	
 	self
-	
 		should: [ stack top ]
-		
 		raise: Error - MessageNotUnderstood 
-		
 		withExceptionDo: [ :anError |
-			
 			self assert: anError messageText = OOStack stackEmptyErrorDescription ]
+		
 ! !
 
 
-!classDefinition: #SentenceFinderByPrefixTest category: 'Stack-Exercise'!
+!classDefinition: #SentenceFinderByPrefixTest category: #'Stack-Exercise'!
 TestCase subclass: #SentenceFinderByPrefixTest
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -173,63 +145,26 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	category: 'Stack-Exercise'!
 
 
-!classDefinition: #OOStack category: 'Stack-Exercise'!
+!classDefinition: #OOStack category: #'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: 'stack'
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:01:41'!
-initialize
-
-	stack := OrderedCollection  new.! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:01:39'!
-isEmpty
-
-	^ stack isEmpty.! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:17:46'!
-pop
-	
-	stack isEmpty ifTrue: [ ^ self error: OOStack stackEmptyErrorDescription ].
-	
-	stack isEmpty ifFalse: [ ^ stack removeLast. ]. 
-! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:02:30'!
-push: aString
-	
-	stack add: aString.! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:01:28'!
-size
-
-	^ stack size.! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:18:34'!
-top
-
-	stack isEmpty ifTrue: [ ^ self error: OOStack stackEmptyErrorDescription ].
-
-	stack isEmpty ifFalse: [ ^ stack last. ].
-
-	! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'OOStack class' category: 'Stack-Exercise'!
+!classDefinition: 'OOStack class' category: #'Stack-Exercise'!
 OOStack class
 	instanceVariableNames: ''!
 
-!OOStack class methodsFor: 'error descriptions' stamp: 'M 5/10/2022 20:04:48'!
+!OOStack class methodsFor: 'error descriptions' stamp: 'HernanWilkinson 5/7/2012 11:51'!
 stackEmptyErrorDescription
-
+	
 	^ 'Stack is empty'! !
 
 
-!classDefinition: #SentenceFinderByPrefix category: 'Stack-Exercise'!
+!classDefinition: #SentenceFinderByPrefix category: #'Stack-Exercise'!
 Object subclass: #SentenceFinderByPrefix
 	instanceVariableNames: ''
 	classVariableNames: ''
