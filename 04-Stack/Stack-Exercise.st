@@ -1,11 +1,11 @@
 !classDefinition: #OOStackTest category: 'Stack-Exercise'!
 TestCase subclass: #OOStackTest
-	instanceVariableNames: ''
+	instanceVariableNames: 'stacks'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 19:44:56'!
+!OOStackTest methodsFor: 'test' stamp: 'M 5/11/2022 20:30:32'!
 test01StackShouldBeEmptyWhenCreated
 
 	| stack |
@@ -106,14 +106,16 @@ test07TopDoesNotRemoveObjectFromStack
 	
 	self assert: stack size = 1.! !
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 19:43:16'!
+!OOStackTest methodsFor: 'test' stamp: 'M 5/11/2022 20:21:25'!
 test08CanNotPopWhenThereAreNoObjectsInTheStack
 
 	| stack  |
 	
 	stack := OOStack new.
 	
-	self
+	self bloque: [ stack pop ] conMensajeDeError: OOStack stackEmptyErrorDescription.
+	
+	"self
 	
 		should: [ stack pop ]
 		
@@ -121,10 +123,10 @@ test08CanNotPopWhenThereAreNoObjectsInTheStack
 		
 		withExceptionDo: [ :anError |
 			
-			self assert: anError messageText = OOStack stackEmptyErrorDescription ]
+			self assert: anError messageText = OOStack stackEmptyErrorDescription ]"
 ! !
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 20:14:07'!
+!OOStackTest methodsFor: 'test' stamp: 'M 5/11/2022 20:20:00'!
 test09CanNotPopWhenThereAreNoObjectsInTheStackAndTheStackHadObjects
 
 	| stack  |
@@ -135,7 +137,9 @@ test09CanNotPopWhenThereAreNoObjectsInTheStackAndTheStackHadObjects
 	
 	stack pop.
 	
-	self
+	self bloque: [ stack pop ] conMensajeDeError: OOStack stackEmptyErrorDescription.
+	
+	"self
 
 		should: [ stack pop ]
 		
@@ -143,17 +147,19 @@ test09CanNotPopWhenThereAreNoObjectsInTheStackAndTheStackHadObjects
 		
 		withExceptionDo: [ :anError |
 			
-			self assert: anError messageText = OOStack stackEmptyErrorDescription ]
+			self assert: anError messageText = OOStack stackEmptyErrorDescription ]"
 ! !
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 19:42:10'!
+!OOStackTest methodsFor: 'test' stamp: 'M 5/11/2022 20:21:37'!
 test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 	| stack  |
 	
 	stack := OOStack new.
 	
-	self
+	self bloque: [ stack top ] conMensajeDeError: OOStack stackEmptyErrorDescription.
+	
+	"self
 	
 		should: [ stack top ]
 		
@@ -161,8 +167,28 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 		
 		withExceptionDo: [ :anError |
 			
-			self assert: anError messageText = OOStack stackEmptyErrorDescription ]
+			self assert: anError messageText = OOStack stackEmptyErrorDescription ]"
 ! !
+
+
+!OOStackTest methodsFor: 'private' stamp: 'M 5/11/2022 20:19:37'!
+bloque: unBloque conMensajeDeError: unMensajeDeError
+
+	self
+
+	should: unBloque
+	
+	raise: Error - MessageNotUnderstood 
+	
+	withExceptionDo: [ :anError |
+		
+		self assert: anError messageText = unMensajeDeError ]! !
+
+
+!OOStackTest methodsFor: 'as yet unclassified' stamp: 'M 5/11/2022 20:29:28'!
+setUp
+
+	stacks := OOStack new.! !
 
 
 !classDefinition: #SentenceFinderByPrefixTest category: 'Stack-Exercise'!
@@ -171,6 +197,32 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefixTest methodsFor: 'as yet unclassified' stamp: 'M 5/11/2022 21:00:28'!
+test01CuandoElStackTieneOracionesYSeBuscaConUnPrefijoElPrefijoEsCaseSensitive
+
+	|stack setenceFinder|
+
+	stack := OOStack new.
+
+	stack push: 'winter is coming'.
+
+	stack push: 'winning is everything'.
+
+	stack push: 'The winds of Winter'.
+
+	stack push: 'Winter is here'.
+
+	setenceFinder := SentenceFinderByPrefix new.
+
+	self assert: 'Winter is here' = (setenceFinder find: 'Wint' with: stack).
+	
+	
+	
+	
+	
+
+	! !
 
 
 !classDefinition: #OOStack category: 'Stack-Exercise'!
@@ -190,13 +242,14 @@ isEmpty
 
 	^ stack isEmpty.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:17:46'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/11/2022 20:32:17'!
 pop
 	
 	stack isEmpty ifTrue: [ ^ self error: OOStack stackEmptyErrorDescription ].
+
+	(stack size > 0) ifTrue: [ ^ stack removeLast. ]. 
 	
-	stack isEmpty ifFalse: [ ^ stack removeLast. ]. 
-! !
+	"^ self xxx."! !
 
 !OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:02:30'!
 push: aString
@@ -217,6 +270,11 @@ top
 
 	! !
 
+!OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:28:31'!
+xxx
+
+	self subclassResponsibility.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'OOStack class' category: 'Stack-Exercise'!
@@ -229,9 +287,68 @@ stackEmptyErrorDescription
 	^ 'Stack is empty'! !
 
 
+!classDefinition: #StackEmpty category: 'Stack-Exercise'!
+OOStack subclass: #StackEmpty
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!StackEmpty methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:27:38'!
+xxx
+
+	^ self error: OOStack stackEmptyErrorDescription! !
+
+
+!classDefinition: #StackWithElements category: 'Stack-Exercise'!
+OOStack subclass: #StackWithElements
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!StackWithElements methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:27:49'!
+xxx
+
+	^ stack removeLast.! !
+
+
 !classDefinition: #SentenceFinderByPrefix category: 'Stack-Exercise'!
 Object subclass: #SentenceFinderByPrefix
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'M 5/11/2022 21:26:08'!
+compararPalabra: unaPalabra con: unPrefijo
+
+	unaPalabra
+	! !
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'M 5/11/2022 21:18:22'!
+find: aPrefix with: aStack
+
+	| array tempStack |
+
+	array := OrderedCollection new.
+	
+	tempStack := OOStack new.
+	
+	(aStack isEmpty) do: [ | ultimo |
+		ultimo := aStack pop.
+		(self compararPalabra: ultimo con: aPrefix) ifTrue: [ array push: ultimo ].
+		tempStack push: ultimo.
+		].
+
+
+	(tempStack isEmpty) do: [ aStack push: (tempStack pop) ].
+
+	^ array.
+
+	
+	! !
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'M 5/11/2022 20:49:49'!
+initialize
+! !
