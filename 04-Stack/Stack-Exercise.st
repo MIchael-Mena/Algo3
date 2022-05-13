@@ -25,7 +25,7 @@ test02PushAddElementsToTheStack
 	
 	self deny: stack isEmpty! !
 
-!OOStackTest methodsFor: 'test' stamp: 'M 5/10/2022 19:41:25'!
+!OOStackTest methodsFor: 'test' stamp: 'Modelando(11-04) 5/12/2022 21:04:15'!
 test03PopRemovesElementsFromTheStack
 
 	| stack |
@@ -185,11 +185,6 @@ bloque: unBloque conMensajeDeError: unMensajeDeError
 		self assert: anError messageText = unMensajeDeError ]! !
 
 
-!OOStackTest methodsFor: 'as yet unclassified' stamp: 'M 5/11/2022 20:29:28'!
-setUp
-
-	stacks := OOStack new.! !
-
 
 !classDefinition: #SentenceFinderByPrefixTest category: 'Stack-Exercise'!
 TestCase subclass: #SentenceFinderByPrefixTest
@@ -225,35 +220,111 @@ test01CuandoElStackTieneOracionesYSeBuscaConUnPrefijoElPrefijoEsCaseSensitive
 	! !
 
 
-!classDefinition: #OOStack category: 'Stack-Exercise'!
-Object subclass: #OOStack
-	instanceVariableNames: 'stack'
+!classDefinition: #EstadoStack category: 'Stack-Exercise'!
+Object subclass: #EstadoStack
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:01:41'!
+!EstadoStack methodsFor: 'as yet unclassified' stamp: 'Modelando(11-04) 5/13/2022 13:37:48'!
+cambiarANoVacio
+
+	self subclassResponsibility ! !
+
+!EstadoStack methodsFor: 'as yet unclassified' stamp: 'Modelando(11-04) 5/13/2022 13:38:30'!
+cambiarAVacio
+
+	self subclassResponsibility ! !
+
+!EstadoStack methodsFor: 'as yet unclassified' stamp: 'Modelando(11-04) 5/13/2022 13:38:44'!
+estaVacio
+
+	self subclassResponsibility ! !
+
+
+!classDefinition: #EstadoNoVacio category: 'Stack-Exercise'!
+EstadoStack subclass: #EstadoNoVacio
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!EstadoNoVacio methodsFor: 'as yet unclassified' stamp: 'Modelando(11-04) 5/12/2022 20:55:48'!
+cambiarANoVacio
+
+	^self	! !
+
+!EstadoNoVacio methodsFor: 'as yet unclassified' stamp: 'Modelando(11-04) 5/12/2022 20:55:03'!
+cambiarAVacio
+	
+	^EstadoVacio new.! !
+
+!EstadoNoVacio methodsFor: 'as yet unclassified' stamp: 'Modelando(11-04) 5/13/2022 13:36:13'!
+estaVacio
+
+	! !
+
+
+!classDefinition: #EstadoVacio category: 'Stack-Exercise'!
+EstadoStack subclass: #EstadoVacio
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!EstadoVacio methodsFor: 'as yet unclassified' stamp: 'Modelando(11-04) 5/12/2022 20:55:57'!
+cambiarANoVacio
+
+	^ EstadoNoVacio new.! !
+
+!EstadoVacio methodsFor: 'as yet unclassified' stamp: 'Modelando(11-04) 5/12/2022 20:55:03'!
+cambiarAVacio
+
+	! !
+
+!EstadoVacio methodsFor: 'as yet unclassified' stamp: 'Modelando(11-04) 5/13/2022 13:36:29'!
+estaVacio
+	
+	|stack|
+	stack := OOStack new.
+	^ stack error: OOStack stackEmptyErrorDescription ! !
+
+
+!classDefinition: #OOStack category: 'Stack-Exercise'!
+Object subclass: #OOStack
+	instanceVariableNames: 'stack estado'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!OOStack methodsFor: 'as yet unclassified' stamp: 'Modelando(11-04) 5/12/2022 20:51:25'!
 initialize
 
-	stack := OrderedCollection  new.! !
+	"stack := OrderedCollection new."
+	
+	stack := OrderedCollection new.
+	estado := EstadoVacio new.! !
 
 !OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:01:39'!
 isEmpty
 
 	^ stack isEmpty.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/11/2022 20:32:17'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'Modelando(11-04) 5/13/2022 13:36:44'!
 pop
 	
-	stack isEmpty ifTrue: [ ^ self error: OOStack stackEmptyErrorDescription ].
-
-	(stack size > 0) ifTrue: [ ^ stack removeLast. ]. 
+	estado estaVacio.
 	
-	"^ self xxx."! !
+	(stack size = 1) ifTrue: [ estado := EstadoVacio new].
+	
+	^ stack removeLast. 
+	! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:02:30'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'Modelando(11-04) 5/12/2022 20:55:48'!
 push: aString
 	
+	estado := estado cambiarANoVacio.
 	stack add: aString.! !
 
 !OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:01:28'!
@@ -261,19 +332,13 @@ size
 
 	^ stack size.! !
 
-!OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:18:34'!
+!OOStack methodsFor: 'as yet unclassified' stamp: 'Modelando(11-04) 5/13/2022 13:36:54'!
 top
 
-	stack isEmpty ifTrue: [ ^ self error: OOStack stackEmptyErrorDescription ].
-
-	stack isEmpty ifFalse: [ ^ stack last. ].
+	estado estaVacio .	
+	^stack last. 
 
 	! !
-
-!OOStack methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:28:31'!
-xxx
-
-	self subclassResponsibility.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -285,32 +350,6 @@ OOStack class
 stackEmptyErrorDescription
 
 	^ 'Stack is empty'! !
-
-
-!classDefinition: #StackEmpty category: 'Stack-Exercise'!
-OOStack subclass: #StackEmpty
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
-
-!StackEmpty methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:27:38'!
-xxx
-
-	^ self error: OOStack stackEmptyErrorDescription! !
-
-
-!classDefinition: #StackWithElements category: 'Stack-Exercise'!
-OOStack subclass: #StackWithElements
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Stack-Exercise'!
-
-!StackWithElements methodsFor: 'as yet unclassified' stamp: 'M 5/10/2022 20:27:49'!
-xxx
-
-	^ stack removeLast.! !
 
 
 !classDefinition: #SentenceFinderByPrefix category: 'Stack-Exercise'!
