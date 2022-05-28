@@ -183,6 +183,11 @@ TestCase subclass: #SentenceFinderByPrefixTest
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'M 5/18/2022 22:22:24'!
+addElements: aListElements at: aStack
+
+	aListElements do: [:element | aStack push: element].! !
+
 !SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'M 5/16/2022 16:47:34'!
 test01IfTheStackIsEmptyAnEmptyArrayIsReturned
 
@@ -225,21 +230,15 @@ test03aPrefixCanOnlyContainLetters
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'M 5/16/2022 17:32:13'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'M 5/18/2022 22:22:44'!
 test04FinderAPrefixInAStackWithSentencesIsCaseSensitive
 
 	|stack  |
 
 	stack := OOStack new.
-
-	stack push: 'winter is coming'.
-
-	stack push: 'winning is everything'.
-
-	stack push: 'The winds of Winter'.
-
-	stack push: 'Winter is here'.
 	
+	self addElements: {'winter is coming'.'winning is everything'.'The winds of Winter'.'Winter is here'} at: stack.
+
 	self assert: (SentenceFinderByPrefix with: stack and: 'Wint') = {'Winter is here'}.
 	
 	self assert: (SentenceFinderByPrefix with: stack and: 'wint') = {'winter is coming'}.
@@ -249,20 +248,14 @@ test04FinderAPrefixInAStackWithSentencesIsCaseSensitive
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'M 5/16/2022 17:28:02'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'M 5/18/2022 22:23:35'!
 test05FinderAPrefixInAStackWithSentencesReturnsAllSentencesContainingThePrefixAtTheBeginning
 
 	|stack  |
 
 	stack := OOStack new.
-
-	stack push: 'winter is coming'.
-
-	stack push: 'The winds of Winter'.
 	
-	stack push: 'winning is everything'.
-
-	stack push: 'Winter is here'.
+	self addElements: {'winter is coming'.'The winds of Winter'.'winning is everything'.'Winter is here'.} at: stack.
 	
 	self assert: (SentenceFinderByPrefix with: stack and: 'win') = {'winter is coming'. 'winning is everything'}.
 
@@ -272,20 +265,14 @@ test05FinderAPrefixInAStackWithSentencesReturnsAllSentencesContainingThePrefixAt
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'M 5/16/2022 17:13:46'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'M 5/18/2022 22:24:20'!
 test06WhenFinishingTheSearchForAPrefixTheStackKeepsTheSameOrder
 
 	|stack|
 
 	stack := OOStack new.
 	
-	stack push: 'winter is coming'.
-
-	stack push: 'winning is everything'.
-
-	stack push: 'The winds of Winter'.
-
-	stack push: 'Winter is here'.
+	self addElements: {'winter is coming'.'winning is everything'.'The winds of Winter'.'Winter is here'.} at: stack.
 	
 	SentenceFinderByPrefix with: stack and: 'Wint'.
 	
@@ -296,20 +283,14 @@ test06WhenFinishingTheSearchForAPrefixTheStackKeepsTheSameOrder
 
 	! !
 
-!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'M 5/16/2022 17:24:39'!
+!SentenceFinderByPrefixTest methodsFor: 'test' stamp: 'M 5/18/2022 22:25:00'!
 test07TheOrderOfReturnedSentencesIsReverseToTheLiFOBehaviorOfTheStack
 
 	|stack  |
 
 	stack := OOStack new.
 
-	stack push: 'winter is coming'.
-
-	stack push: 'winds of Winter'.
-	
-	stack push: 'winning is everything'.
-
-	stack push: 'winter is here'.
+	self addElements:{'winter is coming'.'winds of Winter'.'winning is everything'.'winter is here'.} at: stack.
 	
 	self assert: (SentenceFinderByPrefix with: stack and: 'win') = {'winter is coming'. 'winds of Winter'. 'winning is everything'. 'winter is here'}.
 
