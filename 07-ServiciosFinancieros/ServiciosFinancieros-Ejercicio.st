@@ -86,7 +86,7 @@ test07AccountKnowsItsTransactions
 "	self assert: 1 equals: account transactions size.
 	self assert: (account transactions includes: deposit)."! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 18:16:11'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 18:47:20'!
 test08TransferenciaEntreDosCuentasReduceElBalanceDeLaCuentaExtraidaYIncrementaElBalanceDeLaCuentaDepositadaPorElValorDeLaTransaccion
 
 	| accountToWithdraw accountToDeposit |
@@ -94,27 +94,57 @@ test08TransferenciaEntreDosCuentasReduceElBalanceDeLaCuentaExtraidaYIncrementaEl
 	accountToDeposit := ReceptiveAccount new.
 	accountToWithdraw := ReceptiveAccount new.
 	Deposit register: 100 * peso on: accountToWithdraw.
-	
+
 	Transferencia register: 25 * peso toWithdrawFrom: accountToWithdraw andDepositOn: accountToDeposit.
-	
+
 	self assert: 75 * peso equals: accountToWithdraw balance.
 	self assert: 25 * peso equals: accountToDeposit balance.
 	
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 18:06:54'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 18:29:43'!
 test09EnUnaTransaccionEntreDosCuentasAmbasRegistranLaTransferencia
 
-	| accountToDebit accountToAccredit |
+	| accountToWithdraw accountToDeposit transferencia |
 	
-	accountToAccredit := ReceptiveAccount new.
-	accountToDebit := ReceptiveAccount new.
-	Deposit register: 100 * peso on: accountToDebit.
+	accountToDeposit := ReceptiveAccount new.
+	accountToWithdraw := ReceptiveAccount new.
+	Deposit register: 100 * peso on: accountToWithdraw.
 	
-	Transferencia register: 25 * peso toWithdrawFrom: accountToDebit andDepositOn: accountToAccredit.
+	transferencia := Transferencia register: 25 * peso toWithdrawFrom: accountToWithdraw andDepositOn: accountToDeposit.
 	
-	self assert: 75 * peso equals: accountToDebit balance.
-	self assert: 25 * peso equals: accountToAccredit balance.
+	self assert: (accountToDeposit madeATransaction: transferencia).
+	self assert: (accountToWithdraw madeATransaction: transferencia).! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 19:55:32'!
+test10UnaCuentaConoceSuContraparteDeLaTransaccion
+
+	| accountToWithdraw accountToDeposit transference |
+
+	accountToDeposit := ReceptiveAccount new.
+	accountToWithdraw := ReceptiveAccount new.
+	Deposit register: 100 * peso on: accountToWithdraw.
+
+	transference := Transferencia register: 25 * peso toWithdrawFrom: accountToWithdraw andDepositOn: accountToDeposit.
+	
+"	self assert: (accountToDeposit contraparteDeTransaccionDeposit: transference) equals: accountToWithdraw.
+	self assert: (accountToDeposit contraparteDeTransaccionWithdraw: transference) equals: accountToDeposit.
+	
+	self assert: (accountToWithdraw contraparteDeTransaccionWithdraw: transference) equals: accountToDeposit."
+	
+	self assert: (accountToDeposit contraparteDeTransaccion: transference) equals: accountToWithdraw.
+	self assert: (accountToWithdraw contraparteDeTransaccion: transference) equals: accountToDeposit.! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 19:31:52'!
+test11
+
+	| account deposit |
+
+	account := ReceptiveAccount new.
+	deposit := Deposit register: 100 * peso on: account.
+
+	self assert: (account contraparteDeTransaccionDeposit: deposit) equals: account.
+	self assert: (account contraparteDeTransaccionWithdraw: deposit) equals: account.
 	
 ! !
 
@@ -202,17 +232,48 @@ for: aValue
 
 !classDefinition: #Transferencia category: 'ServiciosFinancieros-Ejercicio'!
 AccountTransaction subclass: #Transferencia
-	instanceVariableNames: 'value accountToDebit accountToAccredit'
+	instanceVariableNames: 'value accountParaRetirar accountParaDepositar'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!Transferencia methodsFor: 'initialization' stamp: 'M 6/4/2022 20:24:04'!
+!Transferencia methodsFor: 'initialization' stamp: 'M 6/5/2022 19:40:58'!
 initializeRegister: aValue toDebitOn: aAccountToDebit andAccreditOn: aAccountToAccredit 
 
 	value := aValue.
-	accountToDebit := aAccountToDebit.
-	accountToAccredit := aAccountToAccredit.! !
+	accountParaRetirar := aAccountToDebit.
+	accountParaDepositar := aAccountToAccredit.! !
+
+
+!Transferencia methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 19:23:44'!
+contraparteDeTransaccion: aTrasference
+
+	self subclassResponsibility.! !
+
+!Transferencia methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 19:40:58'!
+pataDeposito
+
+	^ accountParaDepositar.
+	! !
+
+!Transferencia methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 19:40:49'!
+pataExtraccion
+
+	^ accountParaRetirar.
+	! !
+
+!Transferencia methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 18:55:23'!
+realizarOperacionConBalance: aBalance
+
+	^ aBalance.! !
+
+!Transferencia methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 19:56:44'!
+xxx: aAccount
+
+	(accountParaRetirar == aAccount)
+	ifTrue: [ ^  accountParaDepositar]
+	ifFalse: [ ^  accountParaRetirar]
+	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -220,13 +281,26 @@ initializeRegister: aValue toDebitOn: aAccountToDebit andAccreditOn: aAccountToA
 Transferencia class
 	instanceVariableNames: ''!
 
-!Transferencia class methodsFor: 'instance creation' stamp: 'M 6/5/2022 18:06:54'!
+!Transferencia class methodsFor: 'instance creation' stamp: 'M 6/5/2022 19:50:27'!
 register: aValue toWithdrawFrom: aAccountToDebit andDepositOn: aAccountToAccredit 
+
+	| transference |
 
 	Withdraw register: aValue on: aAccountToDebit.
 	Deposit register: aValue on: aAccountToAccredit.
+	
+	transference := self new initializeRegister: aValue toDebitOn: aAccountToDebit andAccreditOn: aAccountToAccredit.
+	
+"	transferenceParaRetirar := self new initializeRegister: aValue toDebitOn: aAccountToDebit.
+	transferenceParaDepositar := self new initializeRegister: aValue andAccreditOn: aAccountToAccredit.
+	
+	aAccountToDebit register: transferenceParaRetirar.
+	aAccountToAccredit register: transferenceParaDepositar."
+	
+	aAccountToDebit register: transference.
+	aAccountToAccredit register: transference.
 
-	^self new initializeRegister: aValue toDebitOn: aAccountToDebit andAccreditOn: aAccountToAccredit.! !
+	^ transference.! !
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Ejercicio'!
@@ -306,6 +380,29 @@ transactions
 amountOfTransactionsDone
 
 	^ transactions size.! !
+
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 19:35:25'!
+contraparteDeTransaccion: aTransaction
+
+	^ aTransaction xxx: self.
+
+
+
+! !
+
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 19:19:58'!
+contraparteDeTransaccionDeposit: aTransaction
+
+	(transactions includes: aTransaction) 
+	ifTrue: [ ^ aTransaction pataExtraccion]
+	ifFalse: [ self error: Error].! !
+
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 19:20:07'!
+contraparteDeTransaccionWithdraw: aTransaction
+
+	(transactions includes: aTransaction) 
+	ifTrue: [ ^ aTransaction pataDeposito]
+	ifFalse: [ self error: Error].! !
 
 !ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'M 6/4/2022 21:07:49'!
 madeATransaction: aDeposit 
