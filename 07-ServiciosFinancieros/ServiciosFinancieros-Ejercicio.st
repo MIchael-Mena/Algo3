@@ -72,7 +72,7 @@ test06ReceptiveAccountDoNotKnowNotRegisteredTransactions
 	self deny: (account hasRegistered: deposit).
 	self deny: (account hasRegistered: withdraw).! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/4/2022 21:07:49'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 23:11:02'!
 test07AccountKnowsItsTransactions 
 
 	| account deposit |
@@ -81,7 +81,7 @@ test07AccountKnowsItsTransactions
 	deposit := Deposit register: 50 * peso on: account.
 	
 	self assert: 1 equals: account amountOfTransactionsDone.
-	self assert: (account madeATransaction: deposit).
+	self assert: (account registerATransaction: deposit).
 	
 "	self assert: 1 equals: account transactions size.
 	self assert: (account transactions includes: deposit)."! !
@@ -102,7 +102,7 @@ test08TransferenciaEntreDosCuentasReduceElBalanceDeLaCuentaExtraidaYIncrementaEl
 	
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 18:29:43'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/6/2022 17:49:04'!
 test09EnUnaTransaccionEntreDosCuentasAmbasRegistranLaTransferencia
 
 	| accountToWithdraw accountToDeposit transferencia |
@@ -113,8 +113,11 @@ test09EnUnaTransaccionEntreDosCuentasAmbasRegistranLaTransferencia
 	
 	transferencia := Transferencia register: 25 * peso toWithdrawFrom: accountToWithdraw andDepositOn: accountToDeposit.
 	
-	self assert: (accountToDeposit madeATransaction: transferencia).
-	self assert: (accountToWithdraw madeATransaction: transferencia).! !
+	self assert: (accountToDeposit registerATransaction: transferencia).
+	self assert: (accountToDeposit amountOfTransactionsDone) equals: 1.
+	
+	self assert: (accountToWithdraw registerATransaction: transferencia).
+	self assert: (accountToWithdraw amountOfTransactionsDone) equals: 2.! !
 
 !ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 19:55:32'!
 test10UnaCuentaConoceSuContraparteDeLaTransaccion
@@ -135,17 +138,96 @@ test10UnaCuentaConoceSuContraparteDeLaTransaccion
 	self assert: (accountToDeposit contraparteDeTransaccion: transference) equals: accountToWithdraw.
 	self assert: (accountToWithdraw contraparteDeTransaccion: transference) equals: accountToDeposit.! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 19:31:52'!
-test11
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 20:34:55'!
+test11NoSePuedePedirLaContraparteDeUnRetiroODeposito
 
-	| account deposit |
+	| account deposit withdraw |
 
 	account := ReceptiveAccount new.
 	deposit := Deposit register: 100 * peso on: account.
+	withdraw := Withdraw register: 25 * peso on: account.
 
-	self assert: (account contraparteDeTransaccionDeposit: deposit) equals: account.
+	self
+		should: [ account contraparteDeTransaccion: deposit.
+			account contraparteDeTransaccion: withdraw.
+			]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = ReceptiveAccount contrapartInvalidError ].
+
+"	self assert: (account contraparteDeTransaccionDeposit: deposit) equals: account.
 	self assert: (account contraparteDeTransaccionWithdraw: deposit) equals: account.
+	"
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 20:42:50'!
+test12UnaTransferenciaSeRealizaEntreDosCuentasDiferentes
+
+	| account |
+
+	account := ReceptiveAccount new.
+	Deposit register: 100 * peso on: account.
+
+	self
+		should: [ Transferencia register: 25 * peso toWithdrawFrom: account andDepositOn: account.]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Transferencia accountMustBeDiferentError ].
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 21:06:38'!
+test13UnaTransaccionDebeTenerValorMayorACero
+
+	| account |
+
+	account := ReceptiveAccount new.
+
+	self
+		should: [ Transferencia register: 0 * peso toWithdrawFrom: account andDepositOn: account.
+			Deposit register: -1 * peso on: account.
+			Withdraw register: -50 * peso on: account ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = AccountTransaction transactionInvalidValueError ].
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 21:23:06'!
+test14UnPortfolioContieneCuentas
+
+	| portfolio accountOne accountTwo |
+
+	portfolio := Portfolio new.
 	
+	accountOne := ReceptiveAccount new.
+	Deposit register: 50 * peso on: accountOne.
+	accountTwo := ReceptiveAccount new.
+	Deposit register: 100 * peso on: accountTwo.
+	
+	portfolio add: accountOne.
+	portfolio add: accountTwo.
+	
+	self assert: (portfolio balance) equals: 150 * peso.
+
+
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/5/2022 21:31:50'!
+test15ElPortfolioTieneAlgunaCuentaQueRegistreUnaTransaccion
+
+	| portfolio accountOne accountTwo |
+
+	portfolio := Portfolio new.
+	
+	accountOne := ReceptiveAccount new.
+	Deposit register: 50 * peso on: accountOne.
+	accountTwo := ReceptiveAccount new.
+	
+	portfolio add: accountOne.
+	portfolio add: accountTwo.
+	
+	self assert: (portfolio someAccountRegisterTransaction).
+
+
 ! !
 
 !ReceptiveAccountTest methodsFor: 'tests' stamp: 'M 6/4/2022 20:48:57'!
@@ -177,21 +259,35 @@ value
 
 	self subclassResponsibility ! !
 
+
+!AccountTransaction methodsFor: 'as yet unclassified' stamp: 'M 6/6/2022 17:52:52'!
+realizarOperacionConBalance: aBalance paraLaCuenta: aAccount 
+
+	self subclassResponsibility.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'AccountTransaction class' category: 'ServiciosFinancieros-Ejercicio'!
 AccountTransaction class
 	instanceVariableNames: ''!
 
-!AccountTransaction class methodsFor: 'instance creation' stamp: 'M 6/4/2022 18:08:37'!
+!AccountTransaction class methodsFor: 'instance creation' stamp: 'M 6/5/2022 21:06:07'!
 register: aValue on: account
 
 	| transaction |
+	
+	(aValue < (1 * peso) ) ifTrue: [ self error: AccountTransaction transactionInvalidValueError.].
 	
 	transaction := self for: aValue.
 	account register: transaction.
 	
 	^ transaction! !
+
+
+!AccountTransaction class methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 20:53:57'!
+transactionInvalidValueError
+
+	^ 'El valor de una transacción debe ser mayor a cero.'! !
 
 
 !classDefinition: #Deposit category: 'ServiciosFinancieros-Ejercicio'!
@@ -213,8 +309,8 @@ value
 	^ value! !
 
 
-!Deposit methodsFor: 'as yet unclassified' stamp: 'M 6/4/2022 18:23:37'!
-realizarOperacionConBalance: aBalance
+!Deposit methodsFor: 'as yet unclassified' stamp: 'M 6/6/2022 17:52:52'!
+realizarOperacionConBalance: aBalance paraLaCuenta: aAccount 
 
 	^ aBalance + self value.! !
 
@@ -228,6 +324,14 @@ Deposit class
 for: aValue
 
 	^ self new initializeFor: aValue ! !
+
+
+!classDefinition: #TransferenceDeposit category: 'ServiciosFinancieros-Ejercicio'!
+Deposit subclass: #TransferenceDeposit
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
 
 
 !classDefinition: #Transferencia category: 'ServiciosFinancieros-Ejercicio'!
@@ -245,10 +349,15 @@ initializeRegister: aValue toDebitOn: aAccountToDebit andAccreditOn: aAccountToA
 	accountParaDepositar := aAccountToAccredit.! !
 
 
-!Transferencia methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 19:23:44'!
-contraparteDeTransaccion: aTrasference
+!Transferencia methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 20:31:26'!
+contraparteDeUnaCuenta: aAccount
 
-	self subclassResponsibility.! !
+"	^ aAccount aaa: accountParaRetirar."
+
+	(accountParaRetirar == aAccount)
+	ifTrue: [ ^  accountParaDepositar]
+	ifFalse: [ ^  accountParaRetirar]
+	! !
 
 !Transferencia methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 19:40:58'!
 pataDeposito
@@ -262,18 +371,15 @@ pataExtraccion
 	^ accountParaRetirar.
 	! !
 
-!Transferencia methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 18:55:23'!
-realizarOperacionConBalance: aBalance
+!Transferencia methodsFor: 'as yet unclassified' stamp: 'M 6/6/2022 18:00:38'!
+realizarOperacionConBalance: aBalance paraLaCuenta: aAccount 
 
-	^ aBalance.! !
-
-!Transferencia methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 19:56:44'!
-xxx: aAccount
-
-	(accountParaRetirar == aAccount)
-	ifTrue: [ ^  accountParaDepositar]
-	ifFalse: [ ^  accountParaRetirar]
-	! !
+	 
+	(accountParaRetirar == aAccount) 
+	ifTrue: [ ^ aBalance -  value].
+	
+	(accountParaDepositar == aAccount )
+	ifTrue: [^ aBalance +  value]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -281,26 +387,45 @@ xxx: aAccount
 Transferencia class
 	instanceVariableNames: ''!
 
-!Transferencia class methodsFor: 'instance creation' stamp: 'M 6/5/2022 19:50:27'!
+!Transferencia class methodsFor: 'instance creation' stamp: 'M 6/6/2022 17:46:48'!
 register: aValue toWithdrawFrom: aAccountToDebit andDepositOn: aAccountToAccredit 
 
 	| transference |
 
-	Withdraw register: aValue on: aAccountToDebit.
-	Deposit register: aValue on: aAccountToAccredit.
+	self validateValue: aValue .
+	self validateTransferenceBetween: aAccountToDebit and: aAccountToAccredit.
+
+"	Withdraw register: aValue on: aAccountToDebit.
+	Deposit register: aValue on: aAccountToAccredit."
 	
 	transference := self new initializeRegister: aValue toDebitOn: aAccountToDebit andAccreditOn: aAccountToAccredit.
 	
 "	transferenceParaRetirar := self new initializeRegister: aValue toDebitOn: aAccountToDebit.
-	transferenceParaDepositar := self new initializeRegister: aValue andAccreditOn: aAccountToAccredit.
-	
-	aAccountToDebit register: transferenceParaRetirar.
-	aAccountToAccredit register: transferenceParaDepositar."
+	transferenceParaDepositar := self new initializeRegister: aValue andAccreditOn: aAccountToAccredit."
 	
 	aAccountToDebit register: transference.
 	aAccountToAccredit register: transference.
+	
+"	aAccountToAccredit register: (TransferenceDeposit register: aValue withdrawnFrom: aAccountToDebit ).
+	aAccountToDebit register: (TransferenceWithdraw register: aValue depositedOn: aAccountToAccredit )."
 
 	^ transference.! !
+
+
+!Transferencia class methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 20:37:40'!
+accountMustBeDiferentError
+
+	^ 'Para realizar una transferencia las cuentas deben ser diferentes.'! !
+
+!Transferencia class methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 23:19:52'!
+validateTransferenceBetween: aAccountToDebit and: aAccountToAccredit.
+
+	(aAccountToDebit == aAccountToAccredit) ifTrue: [ self error: Transferencia accountMustBeDiferentError ].! !
+
+!Transferencia class methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 21:06:26'!
+validateValue: aValue
+
+	(aValue < (1*peso)) ifTrue: [ self error: AccountTransaction transactionInvalidValueError.].! !
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Ejercicio'!
@@ -322,8 +447,8 @@ value
 	^ value! !
 
 
-!Withdraw methodsFor: 'as yet unclassified' stamp: 'M 6/4/2022 18:23:31'!
-realizarOperacionConBalance: aBalance
+!Withdraw methodsFor: 'as yet unclassified' stamp: 'M 6/6/2022 17:52:52'!
+realizarOperacionConBalance: aBalance paraLaCuenta: aAccount 
 
 	^ aBalance - self value.! !
 
@@ -339,6 +464,44 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
+!classDefinition: #TransferenceWithdraw category: 'ServiciosFinancieros-Ejercicio'!
+Withdraw subclass: #TransferenceWithdraw
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+
+!classDefinition: #Portfolio category: 'ServiciosFinancieros-Ejercicio'!
+Object subclass: #Portfolio
+	instanceVariableNames: 'cuentas'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 21:20:43'!
+add: aAccount
+
+	cuentas add: aAccount.! !
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 21:26:23'!
+balance
+
+	^ cuentas sum: [ :aAccount | aAccount balance] ifEmpty: [^0].
+	
+"	^ cuentas inject: 0 into: [ :aBalance : aAccount | aAccount balance]. "! !
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 21:19:54'!
+initialize
+
+	cuentas := OrderedCollection new.! !
+
+!Portfolio methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 21:34:30'!
+someAccountRegisterTransaction
+
+	^ cuentas anySatisfy: [ :aAccount | aAccount realizoAlgunaTransaccion]! !
+
+
 !classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
 Object subclass: #ReceptiveAccount
 	instanceVariableNames: 'transactions'
@@ -352,10 +515,10 @@ initialize
 	transactions := OrderedCollection new.! !
 
 
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'M 6/4/2022 18:18:10'!
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'M 6/6/2022 17:53:50'!
 balance
 
-	^ transactions inject: 0 into: [ :aBalance :aTransaction | aTransaction realizarOperacionConBalance: aBalance ].
+	^ transactions inject: 0 into: [ :aBalance :aTransaction | aTransaction realizarOperacionConBalance: aBalance paraLaCuenta: self ].
 	
 "	^transactions sum: [ :aTransaction | aTransaction value ] ifEmpty: [ 0 ]"! !
 
@@ -376,15 +539,20 @@ transactions
 	^ transactions copy! !
 
 
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 20:07:53'!
+aaa: aAccount! !
+
 !ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'M 6/4/2022 21:02:35'!
 amountOfTransactionsDone
 
 	^ transactions size.! !
 
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 19:35:25'!
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 20:34:55'!
 contraparteDeTransaccion: aTransaction
 
-	^ aTransaction xxx: self.
+	( (aTransaction isKindOf: Withdraw) or: [ aTransaction isKindOf: Deposit ]) ifTrue: [ self error: ReceptiveAccount contrapartInvalidError].
+
+	^ aTransaction contraparteDeUnaCuenta: self.
 
 
 
@@ -404,7 +572,23 @@ contraparteDeTransaccionWithdraw: aTransaction
 	ifTrue: [ ^ aTransaction pataDeposito]
 	ifFalse: [ self error: Error].! !
 
-!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'M 6/4/2022 21:07:49'!
-madeATransaction: aDeposit 
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 23:24:41'!
+realizoAlgunaTransaccion
+
+	^ transactions isEmpty.! !
+
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 23:11:02'!
+registerATransaction: aDeposit 
 
 	^ transactions includes: aDeposit.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ReceptiveAccount class' category: 'ServiciosFinancieros-Ejercicio'!
+ReceptiveAccount class
+	instanceVariableNames: ''!
+
+!ReceptiveAccount class methodsFor: 'as yet unclassified' stamp: 'M 6/5/2022 20:34:55'!
+contrapartInvalidError
+
+	^ 'Un deposito o retiro no tienen contraparte.'! !
