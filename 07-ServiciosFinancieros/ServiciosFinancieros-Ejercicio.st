@@ -5,7 +5,91 @@ TestCase subclass: #ReceptiveAccountTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!ReceptiveAccountTest methodsFor: 'Portfolios tests' stamp: 'M 6/8/2022 19:19:47'!
+!ReceptiveAccountTest methodsFor: 'Portfolio-extra tests' stamp: 'M 6/9/2022 14:48:11'!
+test20UnPortfolioNoSePuedeAgregarUnaCuentaYaExistente
+
+	| portfolioOne portfolioTwo account otherAccount |
+	
+	portfolioOne := Portfolio new.
+	portfolioTwo := Portfolio new.
+	account := ReceptiveAccount new.
+	otherAccount := ReceptiveAccount new.
+	
+	portfolioOne add: account.	
+	portfolioOne add: otherAccount.
+
+	self
+		should: [ 	portfolioOne add: account ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Portfolio accountAlreadyExistError].
+		
+! !
+
+!ReceptiveAccountTest methodsFor: 'Portfolio-extra tests' stamp: 'M 6/9/2022 16:31:17'!
+test21UnPortfolioNoSePuedeAgregagarASiMismo
+
+	| portfolioOne portfolioTwo |
+	
+	portfolioOne := Portfolio new.
+	portfolioTwo := Portfolio new.
+	
+"	portfolioTwo add: portfolioOne."
+
+	self
+		should: [ 	portfolioOne add: portfolioOne.
+			"portfolioOne add: portfolioTwo"]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Portfolio portfolioMustBeDiferentError].
+		
+		
+! !
+
+!ReceptiveAccountTest methodsFor: 'Portfolio-extra tests' stamp: 'M 6/9/2022 16:27:00'!
+test22EnUnPortfolioQueContieneOtroPortofolioNoSeLePuedeAgregarUnaCuentaYaExistente
+
+	| portfolioOne portfolioTwo account |
+	
+	portfolioOne := Portfolio new.
+	portfolioTwo := Portfolio new.
+	account := ReceptiveAccount new.
+
+	portfolioTwo add: account.
+	portfolioOne add: portfolioTwo.
+
+	self
+		should: [ 	portfolioOne add: account.	 ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Portfolio accountAlreadyExistError].
+		
+		
+! !
+
+!ReceptiveAccountTest methodsFor: 'Portfolio-extra tests' stamp: 'M 6/9/2022 16:32:24'!
+test23UnPortfolioNoPuedeAgregarOtroPortfolioQueTengaUnPortfolioConUnaCuentaYaExistente
+
+	| portfolioOne portfolioTwo account |
+	
+	portfolioOne := Portfolio new.
+	portfolioTwo := Portfolio new.
+	account := ReceptiveAccount new.
+
+	portfolioOne add: account.	
+	portfolioTwo add: account.
+
+	self
+		should: [ 	portfolioTwo add: portfolioOne ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = Portfolio accountAlreadyExistError].
+		
+		
+! !
+
+
+!ReceptiveAccountTest methodsFor: 'Portfolio tests' stamp: 'M 6/8/2022 23:51:04'!
 test15UnPortfolioPuedeContenerUnaCuentaUOtroPortfolio
 
 	| portfolioOne portfolioTwo accountOne  |
@@ -17,10 +101,10 @@ test15UnPortfolioPuedeContenerUnaCuentaUOtroPortfolio
 	portfolioOne add: accountOne.
 	portfolioOne add: portfolioTwo.
 	
-	self assert: (portfolioOne cantidadDeCuentasOPortfolios) equals: 2.
+	self assert: (portfolioOne size) equals: 2.
 ! !
 
-!ReceptiveAccountTest methodsFor: 'Portfolios tests' stamp: 'M 6/8/2022 19:42:29'!
+!ReceptiveAccountTest methodsFor: 'Portfolio tests' stamp: 'M 6/8/2022 19:42:29'!
 test16UnPortfolioConoceSiAlgunaCuentaQueContieneRegistraUnaTransaccion
 
 	| portfolio otherPortfolio accountOne accountTwo |
@@ -38,8 +122,26 @@ test16UnPortfolioConoceSiAlgunaCuentaQueContieneRegistraUnaTransaccion
 	self assert: (portfolio madeSomeTransaction).
 ! !
 
-!ReceptiveAccountTest methodsFor: 'Portfolios tests' stamp: 'M 6/8/2022 19:23:03'!
-test17ElBalanceDeUnPortfolioEsElBalanceDeLosPortfoliosYCuentasQueContiene
+!ReceptiveAccountTest methodsFor: 'Portfolio tests' stamp: 'M 6/8/2022 19:58:56'!
+test17UnPortfolioConoceSiUnaTransaccionEstaContenidaDentroDeEl
+
+	| portfolio otherPortfolio accountOne accountTwo deposit |
+
+	portfolio := Portfolio new.
+	otherPortfolio := Portfolio new.
+	accountOne := ReceptiveAccount new.
+	accountTwo := ReceptiveAccount new.
+
+	deposit := Deposit register: 50 * peso on: accountOne.
+	otherPortfolio add: accountOne.
+	otherPortfolio add: accountTwo.
+	portfolio add: otherPortfolio.
+
+	self assert: (portfolio hasRegistered: deposit).
+! !
+
+!ReceptiveAccountTest methodsFor: 'Portfolio tests' stamp: 'M 6/8/2022 19:54:50'!
+test18ElBalanceDeUnPortfolioEsElBalanceDeLosPortfoliosYCuentasQueContiene
 
 	| portfolio otherPortfolio accountOne accountTwo |
 	
@@ -56,8 +158,8 @@ test17ElBalanceDeUnPortfolioEsElBalanceDeLosPortfoliosYCuentasQueContiene
 	
 	self assert: (portfolio balance) equals: 150 * peso.! !
 
-!ReceptiveAccountTest methodsFor: 'Portfolios tests' stamp: 'M 6/8/2022 19:24:11'!
-test18UnPortfolioPuedeDevolverTodasLasTransaccionesDeSuContenido
+!ReceptiveAccountTest methodsFor: 'Portfolio tests' stamp: 'M 6/8/2022 19:54:55'!
+test19UnPortfolioPuedeDevolverTodasLasTransaccionesDeSuContenido
 
 	| portfolioOne portfolioTwo accountOne accountTwo depositOne depositTwo  |
 	
@@ -107,7 +209,7 @@ test09EnUnaTransaccionEntreDosCuentasAmbasRegistranLaTransferencia
 	self assert: (accountToWithdraw hasRegistered: transferencia).
 	self assert: (accountToWithdraw amountOfTransactionsDone) equals: 2.! !
 
-!ReceptiveAccountTest methodsFor: 'Transference tests' stamp: 'M 6/8/2022 17:54:16'!
+!ReceptiveAccountTest methodsFor: 'Transference tests' stamp: 'M 6/8/2022 20:04:42'!
 test10UnaCuentaConoceSuContraparteDeLaTransaccion
 
 	| accountToWithdraw accountToDeposit transference |
@@ -118,12 +220,9 @@ test10UnaCuentaConoceSuContraparteDeLaTransaccion
 	Deposit register: 100 * peso on: accountToWithdraw.
 	transference := Transference register: 25 * peso toWithdrawFrom: accountToWithdraw andDepositOn: accountToDeposit.
 	
-"	self assert: (accountToDeposit contrapartOfTransaction: transference) equals: accountToWithdraw.
-	self assert: (accountToWithdraw contrapartOfTransaction: transference) equals: accountToDeposit."
-	
 	self assert: (accountToDeposit pataExtraccionDeTransferencia: transference) equals: accountToWithdraw.
 	self assert: (accountToDeposit pataDepositoDeTransferencia: transference) equals: accountToDeposit.
-	
+
 	self assert: (accountToWithdraw pataExtraccionDeTransferencia: transference) equals: accountToWithdraw.
 	self assert: (accountToWithdraw pataDepositoDeTransferencia: transference) equals: accountToDeposit.
 	! !
@@ -146,7 +245,7 @@ test11NoSePuedePedirLaPataDeUnRetiroODeposito
 			self assert: anError messageText = ReceptiveAccount transactiontInvalidError ].
 ! !
 
-!ReceptiveAccountTest methodsFor: 'Transference tests' stamp: 'M 6/8/2022 18:17:50'!
+!ReceptiveAccountTest methodsFor: 'Transference tests' stamp: 'M 6/9/2022 15:34:08'!
 test12NoSePuedePedirLaPataDeUnaTransferenciaNoRegistrada
 
 	| accountToDeposit accountToWithdraw otherAccount transeference|
@@ -181,7 +280,7 @@ test13UnaTransferenciaSeRealizaEntreDosCuentasDiferentes
 		withExceptionDo: [ :anError |
 					self assert: anError messageText = Transference accountMustBeDiferentError ].! !
 
-!ReceptiveAccountTest methodsFor: 'Transference tests' stamp: 'M 6/8/2022 00:39:47'!
+!ReceptiveAccountTest methodsFor: 'Transference tests' stamp: 'M 6/9/2022 15:34:29'!
 test14UnaTransaccionDebeTenerValorMayorACero
 
 	| account |
@@ -437,34 +536,59 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
+!classDefinition: #Activos category: 'ServiciosFinancieros-Ejercicio'!
+Object subclass: #Activos
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Ejercicio'!
+
+!Activos methodsFor: 'as yet unclassified' stamp: 'M 6/8/2022 19:52:03'!
+balance
+
+	self subclassResponsibility! !
+
+!Activos methodsFor: 'as yet unclassified' stamp: 'M 6/8/2022 19:51:57'!
+hasRegistered: aTransaction
+
+	self subclassResponsibility ! !
+
+!Activos methodsFor: 'as yet unclassified' stamp: 'M 6/8/2022 19:51:48'!
+madeSomeTransaction
+
+	self subclassResponsibility ! !
+
+
 !classDefinition: #Portfolio category: 'ServiciosFinancieros-Ejercicio'!
-Object subclass: #Portfolio
+Activos subclass: #Portfolio
 	instanceVariableNames: 'portfolio'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Ejercicio'!
 
-!Portfolio methodsFor: 'main protocol' stamp: 'M 6/7/2022 20:14:00'!
+!Portfolio methodsFor: 'main protocol' stamp: 'M 6/9/2022 15:51:04'!
 add: aPortfolio
+	
+	self validatePortfolio: aPortfolio.
+	
+	self validateAccountAlreadyExist: aPortfolio.
 
 	portfolio add: aPortfolio.! !
 
-!Portfolio methodsFor: 'main protocol' stamp: 'M 6/8/2022 18:49:51'!
+!Portfolio methodsFor: 'main protocol' stamp: 'M 6/9/2022 16:33:09'!
 balance
 
-	^ portfolio sum: [ :anAccount | anAccount balance] ifEmpty: [^0].
-	
-"	^ cuentas inject: 0 into: [ :aBalance : aAccount | aAccount balance]. "! !
-
-!Portfolio methodsFor: 'main protocol' stamp: 'M 6/7/2022 20:07:53'!
-cantidadDeCuentasOPortfolios
-
-	^ portfolio size! !
+	^ portfolio sum: [ :anAccount | anAccount balance] ifEmpty: [^0].! !
 
 !Portfolio methodsFor: 'main protocol' stamp: 'M 6/8/2022 19:32:34'!
 madeSomeTransaction
 
 	^ portfolio anySatisfy: [ :aAccount | aAccount madeSomeTransaction]! !
+
+!Portfolio methodsFor: 'main protocol' stamp: 'M 6/8/2022 23:51:04'!
+size
+
+	^ portfolio size! !
 
 
 !Portfolio methodsFor: 'accessing' stamp: 'M 6/7/2022 20:12:21'!
@@ -484,9 +608,76 @@ initialize
 
 	portfolio := OrderedCollection new.! !
 
+
+!Portfolio methodsFor: 'testing' stamp: 'M 6/9/2022 16:20:57'!
+containsTo: aPortfolio
+
+	^ (self verifyIfIContainA: aPortfolio) 
+	ifTrue: [ self error: Portfolio accountAlreadyExistError ]
+	ifFalse: [ ^false.]! !
+
+!Portfolio methodsFor: 'testing' stamp: 'M 6/8/2022 20:03:00'!
+hasRegistered: aTransaction
+
+	^ portfolio anySatisfy: [ :aAccount | aAccount hasRegistered: aTransaction].
+! !
+
+!Portfolio methodsFor: 'testing' stamp: 'M 6/9/2022 16:21:09'!
+validateAccountAlreadyExist: aPortfolio
+
+	^ (self verifyIfIContainA: aPortfolio) 
+	ifTrue: [ self error: Portfolio accountAlreadyExistError ]
+	ifFalse: [ ^false.].
+
+! !
+
+!Portfolio methodsFor: 'testing' stamp: 'M 6/9/2022 15:52:28'!
+validatePortfolio: aPortfolio
+
+	(aPortfolio == self) 
+	ifTrue: [ self error: Portfolio portfolioMustBeDiferentError ]
+	ifFalse: []! !
+
+!Portfolio methodsFor: 'testing' stamp: 'M 6/9/2022 16:20:11'!
+verifyIfIContainA: aPortfolio
+
+	^ portfolio anySatisfy: [ :otherPortfolio | 
+		
+		
+		(otherPortfolio isKindOf: ReceptiveAccount) 
+		ifTrue: [ 
+			(aPortfolio isKindOf: ReceptiveAccount) ifTrue: [^ otherPortfolio == aPortfolio].
+			(aPortfolio isKindOf: Portfolio) ifTrue: [ ^ aPortfolio verifyIfIContainA: otherPortfolio].
+			].
+		
+		(otherPortfolio isKindOf: Portfolio ) 
+		ifTrue: [ 
+"			(aPortfolio isKindOf: Portfolio ) ifTrue: [ otherPortfolio validatePortfolio: aPortfolio ]."
+			^ otherPortfolio verifyIfIContainA: aPortfolio 
+			].
+		
+	].
+! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Portfolio class' category: 'ServiciosFinancieros-Ejercicio'!
+Portfolio class
+	instanceVariableNames: ''!
+
+!Portfolio class methodsFor: 'error description' stamp: 'M 6/8/2022 20:13:37'!
+accountAlreadyExistError
+
+	^ 'La cuenta ya existe en el portfolio'! !
+
+!Portfolio class methodsFor: 'error description' stamp: 'M 6/8/2022 23:40:57'!
+portfolioMustBeDiferentError
+
+	^ 'Un portfolio no se puede agregar a si mismo'! !
+
 
 !classDefinition: #ReceptiveAccount category: 'ServiciosFinancieros-Ejercicio'!
-Object subclass: #ReceptiveAccount
+Activos subclass: #ReceptiveAccount
 	instanceVariableNames: 'transactions'
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -510,7 +701,7 @@ balance
 	
 "	^transactions sum: [ :aTransaction | aTransaction value ] ifEmpty: [ 0 ]"! !
 
-!ReceptiveAccount methodsFor: 'main protocol' stamp: 'M 6/7/2022 19:53:58'!
+!ReceptiveAccount methodsFor: 'main protocol' stamp: 'M 6/8/2022 19:50:14'!
 hasRegistered: aTransaction
 
 	^ transactions includes: aTransaction! !
@@ -537,10 +728,10 @@ pataDepositoDeTransferencia: aTransference
 	^ (self validateTransference: aTransference) pataDeposito.
 	! !
 
-!ReceptiveAccount methodsFor: 'transference operations' stamp: 'M 6/8/2022 18:13:48'!
+!ReceptiveAccount methodsFor: 'transference operations' stamp: 'M 6/8/2022 19:53:41'!
 pataExtraccionDeTransferencia: aTransference
 
-	^ ((self validateTransference: aTransference)) pataExtraccion.! !
+	^ (self validateTransference: aTransference) pataExtraccion.! !
 
 
 !ReceptiveAccount methodsFor: 'testing' stamp: 'M 6/8/2022 18:17:50'!
@@ -549,6 +740,12 @@ validateTransference: aTransference
 	( (aTransference isKindOf: Withdraw) or: [ aTransference isKindOf: Deposit ]) ifTrue: [ self error: ReceptiveAccount transactiontInvalidError].
 
 	^ (transactions detect: [ :transaction | transaction = aTransference] ifNone: [ self error: ReceptiveAccount transactionNotRegisteredError])! !
+
+
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'M 6/8/2022 20:42:04'!
+estoyDentroDelPortfolio: aPortfolio
+
+	^ aPortfolio validateAccountAlreadyExist: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -599,7 +796,7 @@ value
 	^value ! !
 
 
-!Transference methodsFor: 'comparing' stamp: 'M 6/8/2022 13:24:17'!
+!Transference methodsFor: 'comparing' stamp: 'M 6/8/2022 20:53:27'!
 = aTransference
 
 	^ (aTransference transference == self) or: [ self == aTransference ]! !
