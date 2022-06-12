@@ -371,8 +371,8 @@ test04UnReporteDevuelveElResumenDeCuentaParaCualquierTransaccion
 	
 	! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:06:19'!
-test05UnReporteDevuelveElResumenDeCuentaParaCualquierTransaccion
+!ReportTest methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:55:48'!
+test05ElReporteNetoDeTransferenciaDevuelveLaDiferenciaDeLasTransaferenciasEntrantesYSalientesDeUnaCuenta
 
 	| account otherAccount|
 
@@ -384,8 +384,7 @@ test05UnReporteDevuelveElResumenDeCuentaParaCualquierTransaccion
 	Transfer amount: 20*peso from: account to: otherAccount. 
 	Transfer amount: 30*peso from: otherAccount to: account. 
 
-	self assert: (ReportAccountSummary for: account) 
-	equals: {'Deposito por 100 * pesos' . 'Retiro por 50 * pesos' . 'Salida por transferencia de 20 * pesos'. 'Entrada por transferencia de 30 * pesos' . 'balance = 60 * pesos'} asOrderedCollection.
+	self assert: (ReportTransferNet for: account) equals: 10*peso.
 	
 	
 	! !
@@ -746,8 +745,13 @@ affectBalance: aBalance
 	self subclassResponsibility ! !
 
 
-!AccountTransaction methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 19:01:35'!
-queSos
+!AccountTransaction methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:58:21'!
+affectBalanceNeto: aValue
+
+	^ aValue! !
+
+!AccountTransaction methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:10:58'!
+kindOfTransaction
 
 	^ self subclassResponsibility! !
 
@@ -777,8 +781,8 @@ affectBalance: aBalance
 	^aBalance + value ! !
 
 
-!Deposit methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 19:53:40'!
-queSos
+!Deposit methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:10:58'!
+kindOfTransaction
 
 	^ 'Deposito por '! !
 
@@ -824,6 +828,11 @@ initializeWith: aTransfer
 	transfer := aTransfer! !
 
 
+!TransferLeg methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:58:21'!
+affectBalanceNeto: aValue
+
+	^ self affectBalance: aValue.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'TransferLeg class' category: 'ServiciosFinancieros-Solucion'!
@@ -860,8 +869,8 @@ affectBalance: aBalance
 	^aBalance + self value! !
 
 
-!TransferDepositLeg methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 19:53:10'!
-queSos
+!TransferDepositLeg methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:10:58'!
+kindOfTransaction
 
 	^ 'Entrada por transferencia de '! !
 
@@ -885,8 +894,8 @@ affectBalance: aBalance
 	^aBalance - self value! !
 
 
-!TransferWithdrawLeg methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 19:52:43'!
-queSos
+!TransferWithdrawLeg methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:10:58'!
+kindOfTransaction
 
 	^ 'Salida por transferencia de '! !
 
@@ -916,8 +925,8 @@ affectBalance: aBalance
 	^aBalance - value! !
 
 
-!Withdraw methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 19:53:45'!
-queSos
+!Withdraw methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:10:58'!
+kindOfTransaction
 
 	^ 'Retiro por '! !
 
@@ -965,14 +974,14 @@ Report subclass: #ReportAccountSummary
 ReportAccountSummary class
 	instanceVariableNames: ''!
 
-!ReportAccountSummary class methodsFor: 'instance creation' stamp: 'M 6/11/2022 19:53:26'!
+!ReportAccountSummary class methodsFor: 'instance creation' stamp: 'M 6/11/2022 20:10:58'!
 for: anAccount 
 
 	| arrayOfReport accountSummary |
 	
 	arrayOfReport := OrderedCollection new.
 
-	anAccount transactions do: [ :aTRansaction | arrayOfReport add: ( (aTRansaction queSos),(aTRansaction value) asString )].
+	anAccount transactions do: [ :aTRansaction | arrayOfReport add: ( (aTRansaction kindOfTransaction),(aTRansaction value) asString )].
 	
 	arrayOfReport add: ('balance = ',(anAccount balance) asString).
 
@@ -994,8 +1003,22 @@ Report subclass: #ReportTransferNet
 ReportTransferNet class
 	instanceVariableNames: ''!
 
-!ReportTransferNet class methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 19:10:24'!
-for: anAccount! !
+!ReportTransferNet class methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:58:21'!
+for: anAccount
+
+"	| value2 |
+	
+	value2:= 0.
+	
+	anAccount transactions do: [ :aTransaction |  (((aTransaction isKindOf: Deposit) or: [aTransaction isKindOf: Withdraw]) not)
+		ifTrue: [ value2 := aTransaction affectBalance: value2] ].
+	^ value2."
+	
+"	^ anAccount transactions inject: (0*peso) into: [ :value :aTransaction |  ((aTransaction isKindOf: Deposit) or: [aTransaction isKindOf: Withdraw]) not 
+		ifTrue: [ aTransaction affectBalance: value ]
+		ifFalse: [ value ] ]."
+	
+	^ anAccount transactions inject: (0*peso) into: [ :value :aTransaction |  aTransaction affectBalanceNeto: value ]! !
 
 
 !classDefinition: #Transfer category: 'ServiciosFinancieros-Solucion'!
