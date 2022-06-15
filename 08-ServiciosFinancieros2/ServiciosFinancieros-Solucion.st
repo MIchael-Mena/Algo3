@@ -302,19 +302,43 @@ test07AccountKnowsItsTransactions
 ! !
 
 
-!classDefinition: #ReportTest category: 'ServiciosFinancieros-Solucion'!
-TestCase subclass: #ReportTest
+!classDefinition: #ReportPortfolioTest category: 'ServiciosFinancieros-Solucion'!
+TestCase subclass: #ReportPortfolioTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:32:07'!
+!ReportPortfolioTest methodsFor: 'portfolioTreePrinter' stamp: 'M 6/15/2022 00:09:16'!
+test00
+
+	self assert: (ReportPortfolioTreePrinter for: (ReceptiveAccount named: '	Cuenta de Juan') ) equals: {'Cuenta de Juan'} asOrderedCollection .! !
+
+!ReportPortfolioTest methodsFor: 'portfolioTreePrinter' stamp: 'M 6/15/2022 00:07:59'!
+test01
+
+	| portfolio account anotherAccount |
+	
+	account := ReceptiveAccount named: '	Cuenta de Juan'.
+	anotherAccount := ReceptiveAccount named: '	Cuenta de Angeles'.
+	portfolio := Portfolio named: 'Portfolio de la familia' with: account with: anotherAccount.
+	
+	self assert: (ReportPortfolioTreePrinter for: portfolio) equals: {}.! !
+
+
+!classDefinition: #ReportTransactionTest category: 'ServiciosFinancieros-Solucion'!
+TestCase subclass: #ReportTransactionTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!ReportTransactionTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:32:07'!
 test00ElResumenDeCuentaParaUnaCuentaSinTransaccionesTieneUnBalanceNulo
 
 	self assert: (ReportAccountSummary for: ReceptiveAccount new) equals: {'balance = 0 * pesos'} asOrderedCollection .! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:42:07'!
+!ReportTransactionTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:42:07'!
 test01SePuedeObtenerElResumenDeCuentaParaUnaCuentaConUnDeposito
 
 	| account |
@@ -325,7 +349,7 @@ test01SePuedeObtenerElResumenDeCuentaParaUnaCuentaConUnDeposito
 
 	self assert: (ReportAccountSummary for: account) equals: {'Deposito por 100 * pesos' . 'balance = 100 * pesos'} asOrderedCollection.! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:42:17'!
+!ReportTransactionTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:42:17'!
 test02SePuedeObtenerElResumenDeCuentaParaUnaCuentaConUnaExtraccion
 
 	| account |
@@ -339,7 +363,7 @@ test02SePuedeObtenerElResumenDeCuentaParaUnaCuentaConUnaExtraccion
 	
 	! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:42:25'!
+!ReportTransactionTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:42:25'!
 test03SePuedeObtenerElResumenDeCuentaParaUnaCuentaConUnaTransferencia
 
 	| account otherAccount|
@@ -354,7 +378,7 @@ test03SePuedeObtenerElResumenDeCuentaParaUnaCuentaConUnaTransferencia
 	
 	! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:34:24'!
+!ReportTransactionTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:34:24'!
 test04SePuedeObtenerElResumenDeCuentaParaUnaCuentaConMuchasTransacciones
 
 	| account otherAccount|
@@ -373,7 +397,7 @@ test04SePuedeObtenerElResumenDeCuentaParaUnaCuentaConMuchasTransacciones
 	
 	! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:40:05'!
+!ReportTransactionTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 23:47:30'!
 test05ElReporteNetoDeTransferenciaParaUnDepositoORetiroEsNulo
 
 	| account |
@@ -383,9 +407,9 @@ test05ElReporteNetoDeTransferenciaParaUnDepositoORetiroEsNulo
 	Deposit register: 100*peso on: account.
 	Withdraw register: 50*peso on: account.
 
-	self assert: (ReportTransferNet for: account) equals: 0*peso.! !
+	self assert: (ReportAccountTransferNet for: account) equals: 0*peso.! !
 
-!ReportTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:35:30'!
+!ReportTransactionTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 23:47:30'!
 test06ElReporteNetoDeTransferenciaEsLaDiferenciaEntreLasTransaferenciasEntrantesYSalientesDeUnaCuenta
 
 	| account otherAccount|
@@ -398,10 +422,48 @@ test06ElReporteNetoDeTransferenciaEsLaDiferenciaEntreLasTransaferenciasEntrantes
 	Transfer amount: 20*peso from: account to: otherAccount. 
 	Transfer amount: 30*peso from: otherAccount to: account. 
 
-	self assert: (ReportTransferNet for: account) equals: 10*peso.
+	self assert: (ReportAccountTransferNet for: account) equals: 10*peso.
 	
 	
 	! !
+
+!ReportTransactionTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 21:42:22'!
+test07ElResumenDeCuentaParaUnPortfolioSinTransaccionesTieneUnBalanceNulo
+
+	self assert: (ReportAccountSummary for: Portfolio new) equals: {'balance = 0 * pesos'} asOrderedCollection .! !
+
+!ReportTransactionTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 22:03:38'!
+test08SePuedeObtenerElResumenDeCuentaParaUnPortfolioQueCotieneUnaCuentaConMuchasTransacciones
+
+	| portfolioS account otherAccount |
+	
+	portfolioS := Portfolio new.
+	account := ReceptiveAccount new.
+	otherAccount := ReceptiveAccount new.
+	
+	Deposit register: 100*peso on: account.
+	Withdraw register: 50*peso on: account.
+	Transfer amount: 20*peso from: account to: otherAccount. 
+	Transfer amount: 30*peso from: otherAccount to: account. 
+	portfolioS add: account.
+
+	self assert: (ReportAccountSummary for: portfolioS) equals: {'Deposito por 100 * pesos' . 'Retiro por 50 * pesos' . 'Salida por transferencia de 20 * pesos'. 'Entrada por transferencia de 30 * pesos' . 'balance = 60 * pesos'} asOrderedCollection .! !
+
+!ReportTransactionTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 23:27:38'!
+test09SePuedeObtenerElResumenDeCuentaParaUnPortfolioCompuestoQueTieneUnaCuentaConTransacciones
+
+	| portfolioC portfolioS account |
+	
+	portfolioS := Portfolio new.
+	portfolioC := Portfolio new.
+	account := ReceptiveAccount new.
+	
+	Deposit register: 20*peso on: account.
+	Withdraw register: 15*peso on: account.
+	portfolioS add: account.
+	portfolioC add: portfolioS.
+
+	self assert: (ReportAccountSummary for: portfolioC) equals: {'Deposito por 20 * pesos'.'Retiro por 15 * pesos'.'balance = 5 * pesos'} asOrderedCollection .! !
 
 
 !classDefinition: #TransferTest category: 'ServiciosFinancieros-Solucion'!
@@ -510,7 +572,7 @@ test06CannotTransferAZeroAmount
 
 !classDefinition: #Account category: 'ServiciosFinancieros-Solucion'!
 Object subclass: #Account
-	instanceVariableNames: ''
+	instanceVariableNames: 'name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
@@ -547,6 +609,17 @@ addTransactionsTo: aCollectionOfTransactions
 
 	self subclassResponsibility ! !
 
+
+!Account methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 23:37:31'!
+initializeNamed: aName
+
+	name := aName.! !
+
+!Account methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 23:36:04'!
+name
+
+	^ name.! !
+
 
 !classDefinition: #Portfolio category: 'ServiciosFinancieros-Solucion'!
 Account subclass: #Portfolio
@@ -562,23 +635,25 @@ initialize
 	parents := OrderedCollection new.! !
 
 
-!Portfolio methodsFor: 'main protocol' stamp: 'HAW 5/25/2019 11:19:36'!
+!Portfolio methodsFor: 'main protocol' stamp: 'M 6/14/2022 21:44:08'!
 balance
 	
-	^accounts sum: [ :anAccount | anAccount balance ] ifEmpty: [ 0 ]! !
+	^accounts sum: [ :anAccount | anAccount balance ] ifEmpty: [ 0*peso ]! !
 
 !Portfolio methodsFor: 'main protocol' stamp: 'HAW 5/25/2019 11:28:29'!
 hasRegistered: aTransaction
 
 	^accounts anySatisfy: [ :anAccount | anAccount hasRegistered: aTransaction ]! !
 
-!Portfolio methodsFor: 'main protocol' stamp: 'HAW 5/25/2019 11:38:32'!
+!Portfolio methodsFor: 'main protocol' stamp: 'M 6/14/2022 21:39:46'!
 transactions
 	
 	| transactions |
 	
 	transactions := OrderedCollection new.
-	accounts do: [ :anAccount | anAccount addTransactionsTo: transactions ].
+"	accounts do: [ :anAccount | anAccount addTransactionsTo: transactions ]."
+	
+	accounts do: [ :anAccount | transactions addAll: anAccount transactions ].
 	
 	^transactions ! !
 
@@ -668,14 +743,27 @@ canNotAddAccountErrorMessage
 	
 	^'Can not add repeated account to a portfolio'! !
 
-!Portfolio class methodsFor: 'as yet unclassified' stamp: 'HAW 5/25/2019 11:18:21'!
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 23:41:16'!
+named: aName with: anAccount with: anotherAccount
+
+	| portfolio |
+	
+	portfolio := self new initializeNamed: aName.
+	portfolio add: anAccount;
+		add: anotherAccount;
+		yourself.
+
+	^ portfolio
+! !
+
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 23:30:46'!
 with: anAccount
 
 	^self new 
 		add: anAccount;
 		yourself! !
 
-!Portfolio class methodsFor: 'as yet unclassified' stamp: 'HAW 5/25/2019 11:23:59'!
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 23:30:34'!
 with: anAccount with: anotherAccount
 
 	^self new 
@@ -739,6 +827,18 @@ isComposedBy: anAccount
 
 	^self = anAccount ! !
 
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ReceptiveAccount class' category: 'ServiciosFinancieros-Solucion'!
+ReceptiveAccount class
+	instanceVariableNames: ''!
+
+!ReceptiveAccount class methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 23:31:25'!
+named: aName
+
+	^ self new initializeNamed: aName.! !
+
 
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Solucion'!
 Object subclass: #AccountTransaction
@@ -763,16 +863,6 @@ affectBalance: aBalance
 accept: aReport
 
 	self subclassResponsibility.! !
-
-!AccountTransaction methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:58:21'!
-affectBalanceNeto: aValue
-
-	^ aValue! !
-
-!AccountTransaction methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:10:58'!
-kindOfTransaction
-
-	^ self subclassResponsibility! !
 
 
 !classDefinition: #Deposit category: 'ServiciosFinancieros-Solucion'!
@@ -800,15 +890,10 @@ affectBalance: aBalance
 	^aBalance + value ! !
 
 
-!Deposit methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 19:55:48'!
+!Deposit methodsFor: 'as yet unclassified' stamp: 'M 6/15/2022 19:33:17'!
 accept: aReport
 
-	^ aReport doSomethingForADeposit: self! !
-
-!Deposit methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:10:58'!
-kindOfTransaction
-
-	^ 'Deposito por '! !
+	^ aReport doSomethingForADeposit: self.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -852,11 +937,6 @@ initializeWith: aTransfer
 	transfer := aTransfer! !
 
 
-!TransferLeg methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:58:21'!
-affectBalanceNeto: aValue
-
-	^ self affectBalance: aValue.! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'TransferLeg class' category: 'ServiciosFinancieros-Solucion'!
@@ -898,11 +978,6 @@ accept: aReport
 
 	^ aReport doSomethingForADepositLeg: self! !
 
-!TransferDepositLeg methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:10:58'!
-kindOfTransaction
-
-	^ 'Entrada por transferencia de '! !
-
 
 !classDefinition: #TransferWithdrawLeg category: 'ServiciosFinancieros-Solucion'!
 TransferLeg subclass: #TransferWithdrawLeg
@@ -927,11 +1002,6 @@ affectBalance: aBalance
 accept: aReport
 
 	^ aReport doSomethingForAWithdrawLeg: self! !
-
-!TransferWithdrawLeg methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:10:58'!
-kindOfTransaction
-
-	^ 'Salida por transferencia de '! !
 
 
 !classDefinition: #Withdraw category: 'ServiciosFinancieros-Solucion'!
@@ -964,11 +1034,6 @@ accept: aReport
 
 	^ aReport doSomethingForAWithdraw: self! !
 
-!Withdraw methodsFor: 'as yet unclassified' stamp: 'M 6/11/2022 20:10:58'!
-kindOfTransaction
-
-	^ 'Retiro por '! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Withdraw class' category: 'ServiciosFinancieros-Solucion'!
@@ -992,36 +1057,59 @@ register: aValue on: account
 	^ transaction! !
 
 
-!classDefinition: #Report category: 'ServiciosFinancieros-Solucion'!
-Object subclass: #Report
+!classDefinition: #ReportPortfolioTreePrinter category: 'ServiciosFinancieros-Solucion'!
+Object subclass: #ReportPortfolioTreePrinter
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!Report methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 19:58:04'!
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ReportPortfolioTreePrinter class' category: 'ServiciosFinancieros-Solucion'!
+ReportPortfolioTreePrinter class
+	instanceVariableNames: ''!
+
+!ReportPortfolioTreePrinter class methodsFor: 'as yet unclassified' stamp: 'M 6/15/2022 00:09:43'!
+for: aPortfolio
+
+	| portfolioTree |
+	
+	portfolioTree := aPortfolio transactions collect: [ :aAccount | aAccount name].
+
+	^ portfolioTree! !
+
+
+!classDefinition: #ReportTransaction category: 'ServiciosFinancieros-Solucion'!
+Object subclass: #ReportTransaction
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!ReportTransaction methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 19:58:04'!
 doSomethingForADeposit: aDeposit
 
 	self subclassResponsibility.! !
 
-!Report methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:05:59'!
+!ReportTransaction methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:05:59'!
 doSomethingForADepositLeg: aDepositLeg
 
 	self subclassResponsibility.! !
 
-!Report methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:05:48'!
+!ReportTransaction methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:05:48'!
 doSomethingForAWithdraw: aWithdraw
 
 	self subclassResponsibility.! !
 
-!Report methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:05:41'!
+!ReportTransaction methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:05:41'!
 doSomethingForAWithdrawLeg: aWithdrawLeg
 
 	self subclassResponsibility.! !
 
 
 !classDefinition: #ReportAccountSummary category: 'ServiciosFinancieros-Solucion'!
-Report subclass: #ReportAccountSummary
+ReportTransaction subclass: #ReportAccountSummary
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
@@ -1096,40 +1184,40 @@ for: anAccount
 	^ arrayOfReport.! !
 
 
-!classDefinition: #ReportTransferNet category: 'ServiciosFinancieros-Solucion'!
-Report subclass: #ReportTransferNet
+!classDefinition: #ReportAccountTransferNet category: 'ServiciosFinancieros-Solucion'!
+ReportTransaction subclass: #ReportAccountTransferNet
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!ReportTransferNet methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:21:29'!
+!ReportAccountTransferNet methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:21:29'!
 doSomethingForADeposit: aDeposit
 
 	^ 0*peso.! !
 
-!ReportTransferNet methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:19:41'!
+!ReportAccountTransferNet methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:19:41'!
 doSomethingForADepositLeg: aDepositLeg
 
 	^ aDepositLeg affectBalance: 0*peso.! !
 
-!ReportTransferNet methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:21:33'!
+!ReportAccountTransferNet methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:21:33'!
 doSomethingForAWithdraw: aWithdraw
 
 	^ 0*peso.! !
 
-!ReportTransferNet methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:19:54'!
+!ReportAccountTransferNet methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:19:54'!
 doSomethingForAWithdrawLeg: aWithdrawLeg
 
 	^ aWithdrawLeg affectBalance: 0*peso.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'ReportTransferNet class' category: 'ServiciosFinancieros-Solucion'!
-ReportTransferNet class
+!classDefinition: 'ReportAccountTransferNet class' category: 'ServiciosFinancieros-Solucion'!
+ReportAccountTransferNet class
 	instanceVariableNames: ''!
 
-!ReportTransferNet class methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:25:54'!
+!ReportAccountTransferNet class methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 20:25:54'!
 for: anAccount
 
 "	| value2 |
