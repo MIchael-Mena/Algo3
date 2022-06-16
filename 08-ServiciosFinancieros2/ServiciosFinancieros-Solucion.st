@@ -345,6 +345,66 @@ test03LaEstructuraDeArbolDeUnPortfolioCompuestoEsLaIdentidadDeLasCuentasDeAcuerd
 	{'Portfolio de la familia'.'/tCuenta mia'.'/tPortfolio de hijos'.'/t/tCuenta de Juan'.'/t/tCuenta de Angeles'} asOrderedCollection .! !
 
 
+!ReportPortfolioTest methodsFor: 'PortfolioDetailedTreePrinter' stamp: 'm 6/16/2022 18:04:20'!
+test04ElReporteDeArbolDetalladoParaUnaCuentaVaciaEsLaIdentidadDeLaCuentaMasUnBalanceNulo
+
+	self assert: (ReportPortfolioDetailedTreePrinter for: (ReceptiveAccount named: 'Cuenta de Juan')) equals: {'Cuenta de Juan'.'/tbalance = 0 * pesos'} asOrderedCollection .
+! !
+
+!ReportPortfolioTest methodsFor: 'PortfolioDetailedTreePrinter' stamp: 'm 6/16/2022 18:22:37'!
+test05ElReporteDeArbolDetalladoParaUnPortfolioSimpleEsLaIdentidadDeLaCuentasDelPortfolioMasSuDetallesYSuBalance
+
+	| accountOfAngeles portfolioDeHijos accountOfJuan |
+	
+	accountOfJuan := ReceptiveAccount named: 'Cuenta de Juan'.
+	accountOfAngeles := ReceptiveAccount named: 'Cuenta de Angeles'.
+	portfolioDeHijos := Portfolio named: 'Portfolio de hijos' with: accountOfJuan with: accountOfAngeles.
+	
+	Deposit register: 100*peso on: accountOfJuan.
+	Transfer amount: 25*peso from: accountOfJuan to: accountOfAngeles .
+
+	self assert: (ReportPortfolioDetailedTreePrinter for: portfolioDeHijos) equals: 
+	{'Portfolio de hijos'.
+		'/tCuenta de Juan'.
+			'/t/tDeposito por 100 * pesos'.
+			'/t/tSalida por transferencia de 25 * pesos'. 
+			'/t/tbalance = 75 * pesos'.
+		'/tCuenta de Angeles'.
+			'/t/tEntrada por transferencia de 25 * pesos'. 
+			'/t/tbalance = 25 * pesos'.
+		'/tbalance = 100 * pesos'} asOrderedCollection.! !
+
+!ReportPortfolioTest methodsFor: 'PortfolioDetailedTreePrinter' stamp: 'm 6/16/2022 18:42:51'!
+test06ElReporteDeArbolDetalladoParaUnPortfolioCompuestoEsLaIdentidadDeLaCuentasDelPortfolioMasSuDetallesYSuBalance
+
+	| accountOfAngeles portfolioDeHijos accountOfJuan myAccount portfolioDeFamilia |
+	
+	accountOfJuan := ReceptiveAccount named: 'Cuenta de Juan'.
+	accountOfAngeles := ReceptiveAccount named: 'Cuenta de Angeles'.
+	myAccount := ReceptiveAccount named: 'Cuenta mia'.
+	portfolioDeHijos := Portfolio named: 'Portfolio de hijos' with: accountOfJuan with: accountOfAngeles.
+	portfolioDeFamilia := Portfolio named: 'Portfolio de familia' with: myAccount with: portfolioDeHijos.
+	
+	Deposit register: 100*peso on: myAccount.
+	Deposit register: 100*peso on: accountOfJuan.
+	Transfer amount: 25*peso from: accountOfJuan to: accountOfAngeles .
+
+	self assert: (ReportPortfolioDetailedTreePrinter for: portfolioDeFamilia) equals: 
+	{'Portfolio de familia'.
+		'/tCuenta mia'.
+			'/t/tDeposito por 100 * pesos'.
+			'/t/tbalance = 100 * pesos'.
+		'/tPortfolio de hijos'.
+			'/t/tCuenta de Juan'.
+				'/t/t/tDeposito por 100 * pesos'.
+				'/t/t/tSalida por transferencia de 25 * pesos'. 
+				'/t/t/tbalance = 75 * pesos'.
+			'/t/tCuenta de Angeles'.
+				'/t/t/tEntrada por transferencia de 25 * pesos'. 
+				'/t/t/tbalance = 25 * pesos'.
+			'/t/tbalance = 100 * pesos'.
+		'/tbalance = 200 * pesos'} asOrderedCollection.! !
+
 
 !classDefinition: #ReportTransactionTest category: 'ServiciosFinancieros-Solucion'!
 TestCase subclass: #ReportTransactionTest
@@ -693,10 +753,10 @@ initialize
 	parents := OrderedCollection new.! !
 
 
-!Portfolio methodsFor: 'main protocol' stamp: 'M 6/15/2022 20:08:54'!
+!Portfolio methodsFor: 'main protocol' stamp: 'm 6/16/2022 17:57:25'!
 accounts
 
-	^ accounts.! !
+	^ accounts copy.! !
 
 !Portfolio methodsFor: 'main protocol' stamp: 'M 6/14/2022 21:44:08'!
 balance
@@ -743,7 +803,6 @@ add: accountToAdd
 	accounts add: accountToAdd.
 	accountToAdd addedTo: self 
 	! !
-
 
 
 !Portfolio methodsFor: 'composition' stamp: 'HAW 5/25/2019 12:17:31'!
@@ -1106,6 +1165,44 @@ register: aValue on: account
 	^ transaction! !
 
 
+!classDefinition: #ReportPortfolioDetailedTreePrinter category: 'ServiciosFinancieros-Solucion'!
+Object subclass: #ReportPortfolioDetailedTreePrinter
+	instanceVariableNames: 'portfolioTree'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'ServiciosFinancieros-Solucion'!
+
+!ReportPortfolioDetailedTreePrinter methodsFor: 'initialize' stamp: 'm 6/16/2022 17:53:15'!
+initialize
+
+	portfolioTree := OrderedCollection new.! !
+
+
+!ReportPortfolioDetailedTreePrinter methodsFor: 'main protocol' stamp: 'm 6/16/2022 18:36:23'!
+for: aPortfolio withAPrefix: aTab
+
+	portfolioTree add: aTab,aPortfolio name.
+
+	aPortfolio accounts do: [ :anAccount | self for: anAccount withAPrefix: aTab,'/t'].
+	
+	(aPortfolio accounts isEmpty) 
+	ifTrue: [ portfolioTree addAll: ( (ReportAccountSummary for: aPortfolio) collect: [ :aDetailedOfTransaction | (aTab,'/t',aDetailedOfTransaction) ] ). ]
+	ifFalse: [ portfolioTree add: ( aTab,'/t','balance = ',(aPortfolio balance) asString)  ].
+
+	^portfolioTree.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ReportPortfolioDetailedTreePrinter class' category: 'ServiciosFinancieros-Solucion'!
+ReportPortfolioDetailedTreePrinter class
+	instanceVariableNames: ''!
+
+!ReportPortfolioDetailedTreePrinter class methodsFor: 'as yet unclassified' stamp: 'm 6/16/2022 17:56:37'!
+for: aPortfolio
+
+	^ (ReportPortfolioDetailedTreePrinter new) for: aPortfolio withAPrefix: ''.! !
+
+
 !classDefinition: #ReportPortfolioTreePrinter category: 'ServiciosFinancieros-Solucion'!
 Object subclass: #ReportPortfolioTreePrinter
 	instanceVariableNames: 'portfolioTree'
@@ -1113,7 +1210,7 @@ Object subclass: #ReportPortfolioTreePrinter
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!ReportPortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'm 6/16/2022 17:34:36'!
+!ReportPortfolioTreePrinter methodsFor: 'main protocol' stamp: 'm 6/16/2022 17:56:12'!
 for: aPortfolio withAPrefix: aTab
 
 	portfolioTree add: aTab,aPortfolio name.
@@ -1122,7 +1219,8 @@ for: aPortfolio withAPrefix: aTab
 
 	^portfolioTree.! !
 
-!ReportPortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'M 6/16/2022 01:23:22'!
+
+!ReportPortfolioTreePrinter methodsFor: 'initialize' stamp: 'M 6/16/2022 01:23:22'!
 initialize
 
 	portfolioTree := OrderedCollection new.! !
