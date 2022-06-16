@@ -309,21 +309,40 @@ TestCase subclass: #ReportPortfolioTest
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!ReportPortfolioTest methodsFor: 'portfolioTreePrinter' stamp: 'M 6/15/2022 00:09:16'!
+!ReportPortfolioTest methodsFor: 'portfolioTreePrinter' stamp: 'M 6/15/2022 20:27:17'!
 test00
 
-	self assert: (ReportPortfolioTreePrinter for: (ReceptiveAccount named: '	Cuenta de Juan') ) equals: {'Cuenta de Juan'} asOrderedCollection .! !
+	self assert: (ReportPortfolioTreePrinter for: (ReceptiveAccount named: 'Cuenta de Juan') ) equals: {'Cuenta de Juan'} asOrderedCollection .! !
 
-!ReportPortfolioTest methodsFor: 'portfolioTreePrinter' stamp: 'M 6/15/2022 00:07:59'!
+!ReportPortfolioTest methodsFor: 'portfolioTreePrinter' stamp: 'M 6/15/2022 21:03:03'!
 test01
+
+	self assert: (ReportPortfolioTreePrinter for: (Portfolio named: 'Portfolio solo') ) equals: {'Portfolio solo'} asOrderedCollection .! !
+
+!ReportPortfolioTest methodsFor: 'portfolioTreePrinter' stamp: 'M 6/15/2022 21:01:08'!
+test02
 
 	| portfolio account anotherAccount |
 	
-	account := ReceptiveAccount named: '	Cuenta de Juan'.
-	anotherAccount := ReceptiveAccount named: '	Cuenta de Angeles'.
+	account := ReceptiveAccount named: 'Cuenta de Juan'.
+	anotherAccount := ReceptiveAccount named: 'Cuenta de Angeles'.
 	portfolio := Portfolio named: 'Portfolio de la familia' with: account with: anotherAccount.
 	
-	self assert: (ReportPortfolioTreePrinter for: portfolio) equals: {}.! !
+	self assert: (ReportPortfolioTreePrinter for: portfolio) equals: {'Portfolio de la familia'.'/tCuenta de Juan'.'/tCuenta de Angeles'} asOrderedCollection .! !
+
+!ReportPortfolioTest methodsFor: 'portfolioTreePrinter' stamp: 'M 6/15/2022 21:24:00'!
+test03
+
+	| johnsAccount angiesAccount childrenPortfolio myAccount familyPortfolio |
+	
+	johnsAccount := ReceptiveAccount named: 'Cuenta de Juan'. 
+	angiesAccount := ReceptiveAccount named: 'Cuenta de Angeles'. 
+	childrenPortfolio := Portfolio named: 'Portfolio de hijos' with: johnsAccount with: angiesAccount. 
+	myAccount := ReceptiveAccount named: 'Cuenta mia'. 
+	familyPortfolio := Portfolio named: 'Portfolio de la familia' with: childrenPortfolio with: myAccount.
+
+	self assert: (ReportPortfolioTreePrinter for: familyPortfolio) equals: 
+	{'Portfolio de la familia'.'/tCuenta mia'.'/tPortfolio de hijos'.'/t/tCuenta de Juan'.'/t/tCuenta de Angeles'} asOrderedCollection .! !
 
 
 !classDefinition: #ReportTransactionTest category: 'ServiciosFinancieros-Solucion'!
@@ -449,7 +468,7 @@ test08SePuedeObtenerElResumenDeCuentaParaUnPortfolioQueCotieneUnaCuentaConMuchas
 
 	self assert: (ReportAccountSummary for: portfolioS) equals: {'Deposito por 100 * pesos' . 'Retiro por 50 * pesos' . 'Salida por transferencia de 20 * pesos'. 'Entrada por transferencia de 30 * pesos' . 'balance = 60 * pesos'} asOrderedCollection .! !
 
-!ReportTransactionTest methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 23:27:38'!
+!ReportTransactionTest methodsFor: 'as yet unclassified' stamp: 'M 6/15/2022 19:45:11'!
 test09SePuedeObtenerElResumenDeCuentaParaUnPortfolioCompuestoQueTieneUnaCuentaConTransacciones
 
 	| portfolioC portfolioS account |
@@ -463,7 +482,7 @@ test09SePuedeObtenerElResumenDeCuentaParaUnPortfolioCompuestoQueTieneUnaCuentaCo
 	portfolioS add: account.
 	portfolioC add: portfolioS.
 
-	self assert: (ReportAccountSummary for: portfolioC) equals: {'Deposito por 20 * pesos'.'Retiro por 15 * pesos'.'balance = 5 * pesos'} asOrderedCollection .! !
+	self assert: (ReportAccountSummary for: portfolioC) equals: {'Deposito por 20 * pesos'.'Retiro por 15 * pesos'.'balance = 5 * pesos'} asOrderedCollection.! !
 
 
 !classDefinition: #TransferTest category: 'ServiciosFinancieros-Solucion'!
@@ -620,6 +639,17 @@ name
 
 	^ name.! !
 
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Account class' category: 'ServiciosFinancieros-Solucion'!
+Account class
+	instanceVariableNames: ''!
+
+!Account class methodsFor: 'as yet unclassified' stamp: 'M 6/15/2022 19:55:16'!
+named: aName
+
+	^ self new initializeNamed: aName.! !
+
 
 !classDefinition: #Portfolio category: 'ServiciosFinancieros-Solucion'!
 Account subclass: #Portfolio
@@ -634,6 +664,11 @@ initialize
 	accounts := OrderedCollection new.
 	parents := OrderedCollection new.! !
 
+
+!Portfolio methodsFor: 'main protocol' stamp: 'M 6/15/2022 20:08:54'!
+accounts
+
+	^ accounts.! !
 
 !Portfolio methodsFor: 'main protocol' stamp: 'M 6/14/2022 21:44:08'!
 balance
@@ -743,6 +778,18 @@ canNotAddAccountErrorMessage
 	
 	^'Can not add repeated account to a portfolio'! !
 
+!Portfolio class methodsFor: 'as yet unclassified' stamp: 'M 6/15/2022 20:23:33'!
+named: aName with: anAccount
+
+	| portfolio |
+
+	portfolio := self new initializeNamed: aName.
+	portfolio add: anAccount;
+		yourself.
+
+	^ portfolio
+! !
+
 !Portfolio class methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 23:41:16'!
 named: aName with: anAccount with: anotherAccount
 
@@ -779,7 +826,7 @@ Account subclass: #ReceptiveAccount
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
-!ReceptiveAccount methodsFor: 'initialization' stamp: 'HernanWilkinson 7/13/2011 18:35'!
+!ReceptiveAccount methodsFor: 'initialization' stamp: 'M 6/15/2022 19:56:01'!
 initialize
 
 	super initialize.
@@ -828,16 +875,10 @@ isComposedBy: anAccount
 	^self = anAccount ! !
 
 
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+!ReceptiveAccount methodsFor: 'as yet unclassified' stamp: 'M 6/15/2022 20:41:28'!
+accounts
 
-!classDefinition: 'ReceptiveAccount class' category: 'ServiciosFinancieros-Solucion'!
-ReceptiveAccount class
-	instanceVariableNames: ''!
-
-!ReceptiveAccount class methodsFor: 'as yet unclassified' stamp: 'M 6/14/2022 23:31:25'!
-named: aName
-
-	^ self new initializeNamed: aName.! !
+	^ self! !
 
 
 !classDefinition: #AccountTransaction category: 'ServiciosFinancieros-Solucion'!
@@ -935,7 +976,6 @@ value
 initializeWith: aTransfer
 
 	transfer := aTransfer! !
-
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1064,20 +1104,55 @@ Object subclass: #ReportPortfolioTreePrinter
 	poolDictionaries: ''
 	category: 'ServiciosFinancieros-Solucion'!
 
+!ReportPortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'M 6/15/2022 21:28:42'!
+meterseUnNivelDe: aPortfolio
+
+	^ aPortfolio accounts collect: [ :anAccount | (anAccount isKindOf: Portfolio) ifTrue: [ self xxx: anAccount ].
+			'/t',anAccount name ]! !
+
+!ReportPortfolioTreePrinter methodsFor: 'as yet unclassified' stamp: 'M 6/15/2022 21:15:46'!
+xxx: aPortfolio
+
+	| portfolioTree |
+
+	(aPortfolio isKindOf: ReceptiveAccount ) 
+	ifTrue: [ ^ {aPortfolio name} asOrderedCollection].
+	
+	
+	(aPortfolio isKindOf: Portfolio) 
+	ifTrue: [ portfolioTree := self meterseUnNivelDe: aPortfolio.
+		portfolioTree addFirst: aPortfolio name.
+		^portfolioTree]! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'ReportPortfolioTreePrinter class' category: 'ServiciosFinancieros-Solucion'!
 ReportPortfolioTreePrinter class
 	instanceVariableNames: ''!
 
-!ReportPortfolioTreePrinter class methodsFor: 'as yet unclassified' stamp: 'M 6/15/2022 00:09:43'!
+!ReportPortfolioTreePrinter class methodsFor: 'as yet unclassified' stamp: 'M 6/15/2022 21:06:16'!
 for: aPortfolio
 
-	| portfolioTree |
-	
-	portfolioTree := aPortfolio transactions collect: [ :aAccount | aAccount name].
+	| treePrinter portfolioTree |
 
-	^ portfolioTree! !
+"	portfolioTree := aPortfolio accounts collect: [ :anAccount | 
+		(aPortfolio isKindOf: Portfolio) ifTrue: [ '/t',anAccount name ].
+		(aPortfolio isKindOf: ReceptiveAccount ) ifTrue: [ anAccount name  ]
+		].
+
+	(aPortfolio isKindOf: Portfolio) ifTrue: [ portfolioTree addFirst: aPortfolio name].
+
+	^ portfolioTree"
+	
+	treePrinter := ReportPortfolioTreePrinter new.
+	^ treePrinter xxx: aPortfolio.
+	
+"	(aPortfolio isKindOf: ReceptiveAccount ) 
+	ifTrue: [ ^ {aPortfolio name} asOrderedCollection].
+	(aPortfolio isKindOf: Portfolio) 
+	ifTrue: [ portfolioTree := aPortfolio accounts collect: [ :anAccount | '/t',anAccount name ].
+		portfolioTree addFirst: aPortfolio name.
+		^portfolioTree]."! !
 
 
 !classDefinition: #ReportTransaction category: 'ServiciosFinancieros-Solucion'!
