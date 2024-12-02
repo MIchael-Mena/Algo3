@@ -1,0 +1,2 @@
+Si tengo varias colaboradores relacionados entre si ej: cantidadOrugas cantidadInicialOrguas alimentoDeOrugas, cantidadPolillas cantidadInicialPolillas alimentoDePolillas
+puedo agruparlo en un nuevo objeto y remplazar esos colaboradores por un solo colaborador polimorfico de la clase 'Poblacion' pudiendo ser ej: poblacionOrugas o poblacionPolillas

@@ -1,0 +1,180 @@
+Conceptos fundamentales
+Software / Programa:
+
+    Modelo computable de un dominio de problema de la realidad (vs Secuencia de instrucciones)
+    Paradigma de Objetos: Objetos que colaboran entre sí mediante el envío de mensajes para resolver un problema.
+
+Desarrollo de software:
+
+    Proceso de aprendizaje, iterativo e incremental
+    Eje descriptivo, funcional e implementativo. Foco en eje descriptivo y funcional.
+
+Filosofía Smalltalk:
+
+    Ambiente de aprendizaje
+    Fundacional del paradigma
+    Ambiente vivo
+    Imagen + VM
+    Feedback inmediato
+    “Todo es un objeto”
+
+Conceptos del paradigma
+
+Objeto:
+
+    Representación de un ente de un dominio de problema
+    Se define a partir de los mensajes que sabe responder.
+    Nueva definición (más precisa): Representación del rol que desempeña un ente de la realidad en el contexto de un dominio de problema
+
+Mensaje:
+
+    Define el QUE de un objeto
+    Define una responsabilidad
+    Comportamiento definido a través de un método asociado a un objeto con el mismo nombre que el mensaje
+    Conjunto de mensajes define la escencia de un objeto
+    Son objetos
+
+Método:
+
+    Implementación de un mensaje
+    Representa un conjunto de colaboraciones
+    Define el COMO
+    1 mensaje -> 1 o más métodos asociados
+    Son objetos
+    self: Pseudo-variable que hace referencia al objeto receptor en el contexto de un método.
+
+Colaboradores:
+
+    Otro objeto con el que voy a colaborar. Relación de conocimiento. Variables.
+    También conocido como variables
+    Interno: Lo conozco siempre, relación de cercanía (variable de instancia)
+    Externo: Colabora para un mensaje puntual (parámetro)
+
+4 caracteristicas de una colaboración:
+
+    Sincrónica: Se envia un mensaje y esperamos que el mismo sea respondido. No continuamos con la siguiente colaboracion.
+
+    Dirigida: Envio un mensaje que va a un objeto receptor. Al cual se a quien.
+
+    Ejemplo:
+
+    AlanTuring dateOfBirth.
+
+    Receptor 	Mensaje 	Emisor
+    AlanTuring 	dateOfBirth 	Yo en el ambiente
+
+    Siempre tiene se responde un objeto: En el caso de smalltalk si uno no pone el return explícito responde self.
+
+    Receptor desconoce al emisor: La respuesta a una colaboración es independiente del emisor.
+
+    Ejemplo:
+
+    January/1/2019 distanceTo: March/21/2019.
+
+    El objeto
+
+    March/21/2019
+
+    esta colaborando con el objeto
+
+    January/1/2019
+
+    a traves de este mensaje
+
+    distanceTo:
+
+Closure:
+
+    Objeto que representa un bloque de código
+    Diferencia con método: No está asociado a un mensaje (es anónimo)
+    Representan conjunto de colaboraciones.
+
+    Estan bindeados al contexto. El closure esta unido al contexto.
+
+    Ejemplo:
+
+      m1
+          |t1 myClosure|
+          t1 := 1.
+          myClosure := [t1 := t1 + 1].
+          ^myClosure
+
+    Si hago
+
+      m1 value.
+
+    El resultado sera:
+
+      m1 value. 2
+
+    Si hago nuevamente
+
+      m1 value.
+
+    Devolvera:
+
+      m1 value. 3
+
+Acerca de los métodos y mensajes en smalltalk
+
+  nombreMensaje
+    "comentarios"
+    |respuesta|
+    respuesta := 'Hello world'
+    ^respuesta
+
+El ^ vendria a remplazar el return.
+
+Se asigna el valor a una variable temporal con := o tambien con _.
+
+Las variables se declaran entre | |
+
+Podemos concatenar strings a traves de ,
+
+El punto separa las colaboraciones. Es una forma de decir que viene otra colaboración luego del .
+Otros conceptos importantes del paradigma
+Subclasificación:
+
+    Clase: Objeto que representa un concepto. Ej: Número, Auto.
+    Subclasificación: Nos sirve para organizar el conocimiento en jerarquías (Ontología de conocimientos)
+    Clase abstracta -> No tiene realizaciones concretas -> No existen entes de la realidad que puedo relacionar exclusivamente a ese concepto -> No existen instancias de esa clase.
+        Tiene al menos un mensaje abstracto
+        Mensajes abstracto: No tiene método asociado (en Smalltalk, creamos el método pero lo implementamos con “self subclassResponsibility”)
+
+Heurísticas de diseño:
+
+    Modelar 1:1 entre ente de la realidad y objeto.
+    Buscamos que el conjunto de mensajes sea minimal -> Bajo acoplamiento, alta cohesión.
+    Guiarnos por el aspecto funcional conduce a buenos modelos.
+    Detectar y quitar código repetido para generar un nuevo conocimiento / hacer explícito un concepto (“reíficar”)
+    Nombrar a los objetos (incluyendo colaboradores externos, internos, temporales) según el rol que cumplen en cada contexto.
+    Evitar romper encapsulamiento.
+    Favorecer composicion/delegacion por sobre subclasificacion/herencia.
+
+Técnicas
+Algoritmo para Quitar código repetido
+
+    Copiar lo repetido a otro lado
+    Parametrizar lo que cambia
+    Nombrar la nueva abstraccion
+    Usar la nueva abstraccion
+
+Reemplazar if por polimorfismo
+
+    Crear una jerarquía de clases con una clase por cada condición del if (si es que no existen).
+    Mover el cuerpo del if de cada condición a cada abstracción del paso 1) utilizando un mensaje polimórfico.
+    Nombrar el mensaje polimórfico.
+    Nombrar las abstracciones generadas en el paso 1.
+    Reemplazar el if por el envío del mensaje polimórfico.
+    Buscar el objeto polimórfico (si es necesario)
+
+TDD
+
+    Escribir el test más sencillo que se me ocurra.
+    Correrlo para comprobar que falle y hacerlo pasar con la implementación más simple posible.
+    Reflexionar. ¿Se puede mejorar? Si es así, refactorizar.
+
+Buenas prácticas
+
+    Categorizar los mensajes
+    Implementar mensajes abstractos con “self subclassResponsibility”
